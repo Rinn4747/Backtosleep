@@ -4,6 +4,8 @@
 backtosleep= { }
 backtosleep.runningroost = false
 backtosleep.runningmizzen = false
+backtosleep.runninghourglass = false
+backtosleep.running = false
 backtosleep.lastticks = 0
 backtosleep.GUI = {}
 backtosleep.GUI.open = true
@@ -14,8 +16,15 @@ function backtosleep.ModuleInit()
 	backtosleep.CheckMenu()
 end
 
+
+--Toggle Function 
 function backtosleep.ToggleRunRoost()
     backtosleep.runningroost = not backtosleep.runningroost
+	backtosleep.running = not backtosleep.running
+	
+	-- the others
+	backtosleep.runningmizzen = false
+	backtosleep.runninghourglass = false
 	if Player:IsMoving() then
 		Player:Stop()
 	end
@@ -23,10 +32,28 @@ end
 
 function backtosleep.ToggleRunMizzen()
     backtosleep.runningmizzen = not backtosleep.runningmizzen
+	backtosleep.running = not backtosleep.running
+	
+	-- the others
+	backtosleep.runningroost = false
+	backtosleep.runninghourglass = false
 	if Player:IsMoving() then
 		Player:Stop()
 	end
 end
+
+function backtosleep.ToggleRunHourglass()
+    backtosleep.runninghourglass = not backtosleep.runninghourglass
+	backtosleep.running = not backtosleep.running
+	
+	-- the others
+	backtosleep.runningroost = false
+	backtosleep.runningmizzen = false
+	if Player:IsMoving() then
+		Player:Stop()
+	end
+end
+
 
 
 function backtosleep.CheckMenu()
@@ -55,23 +82,30 @@ function backtosleep.Draw( event, ticks )
     local gamestate = GetGameState()
     if ( gamestate == FFXIV.GAMESTATE.INGAME ) then
         if ( backtosleep.GUI.open ) then
-			GUI:SetNextWindowSize(285,75,GUI.SetCond_FirstUseEver) 			
+			GUI:SetNextWindowSize(400,75,GUI.SetCond_FirstUseEver) 			
             backtosleep.GUI.visible, backtosleep.GUI.open = GUI:Begin("backtosleep", backtosleep.GUI.open)
             if ( backtosleep.GUI.visible ) then
                 backtosleep.Enable,changed = GUI:Checkbox("Enable##Enable", backtosleep.Enable)
-				local toggleroostsleep = GUI:Button("Roost Inn",100)
+				GUI:InputTextEditor([[##State]], tostring(backtosleep.running),400,50,(GUI.InputTextFlags_ReadOnly))
+				GUI:NewLine()
+				local toggleroostsleep = GUI:Button("Roost Inn",100,20)
                 if GUI:IsItemClicked(toggleroostsleep) then 
 					backtosleep.ToggleRunRoost()
                 end
 				GUI:SameLine()
-				GUI:InputText([[##StateRoost]], tostring(backtosleep.runningroost), (GUI.InputTextFlags_ReadOnly))
+				--GUI:InputText([[##StateRoost]], tostring(backtosleep.runningroost), (GUI.InputTextFlags_ReadOnly),100,20)
 				GUI:NewLine()
-				local togglemizzensleep = GUI:Button("Mizzenmast",100)
+				local togglemizzensleep = GUI:Button("Mizzenmast",100,20)
                 if GUI:IsItemClicked(togglemizzensleep) then 
 					backtosleep.ToggleRunMizzen()
                 end
 				GUI:SameLine()
-				GUI:InputText([[##StateMizzen]], tostring(backtosleep.runningmizzen), (GUI.InputTextFlags_ReadOnly))
+				GUI:NewLine()
+				local togglehourglasssleep = GUI:Button("Hourglass",100,20)
+                if GUI:IsItemClicked(togglehourglasssleep) then 
+					backtosleep.ToggleRunHourglass()
+                end
+				--GUI:InputText([[##StateMizzen]], tostring(backtosleep.runningmizzen), (GUI.InputTextFlags_ReadOnly),100,20)
             end
             GUI:End()
         end
@@ -80,11 +114,12 @@ end
 
 
 function backtosleep.OnUpdateHandler( Event, ticks )
-
+--ROOST
 	if backtosleep.runningroost then
-		backtosleep.runningmizzen = false
+		--backtosleep.runningmizzen = false
 		if Player.localmapid == 179 then
 			backtosleep.runningroost = false
+			backtosleep.running = false
 		elseif not (Player.localmapid == 132) then
 			if not  MIsCasting() then
 				Player:Teleport(2)
@@ -105,10 +140,12 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			end
 		end
 	end
+--MIZZENMAST	
 	if backtosleep.runningmizzen then
-		backtosleep.runningroost = false
+		--backtosleep.runningroost = false
 		if Player.localmapid == 177 then
 			backtosleep.runningmizzen = false
+			backtosleep.running = false
 		elseif not (Player.localmapid == 128) and not (Player.localmapid == 129) then
 			if not  MIsCasting() then
 				Player:Teleport(8)
@@ -150,6 +187,61 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 						UseControlAction("SelectString", "SelectIndex", 0)
 					end
 				end	
+			end
+		end		
+	end
+--HOURGLASS	
+	if backtosleep.runninghourglass then
+		--backtosleep.runningroost = false
+		if Player.localmapid == 178 then
+			backtosleep.runninghourglass = false
+			backtosleep.running = false
+		elseif not (Player.localmapid == 130) then
+			if not  MIsCasting() then
+				Player:Teleport(9)
+			end
+		elseif (Player.localmapid == 130) then
+			if math.distance3d(Player.pos,{x=-147.05,y=-3.15,z=-165.64})<=10 then
+				if not (math.distance3d(Player.pos,{x=-147.05,y=-3.15,z=-165.64})<=3) then
+					Player:MoveTo(-147.05,-3.15,-165.64)
+				else
+					if Player:IsMoving() then
+						Player:Stop()
+					end
+					if MEntityList('contentid=8,maxdistance=25') then
+						if Player:GetTarget() == nil then
+							Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=8,nearest')))))
+						end
+						if not IsControlOpen("SelectString") and not (Player:GetTarget() == nil) then
+							Player:Interact(Player:GetTarget().id)
+						end
+						if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Aethernet." then
+							UseControlAction("SelectString", "SelectIndex", 0)
+						end
+						if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "The Aftcastle." then
+							UseControlAction("SelectString", "SelectIndex", 0)
+						end					
+					end
+				end
+			elseif math.distance3d(Player.pos,{x=39.32,y=8.00,z=-98.18})<=40 then
+				if not (math.distance3d(Player.pos,{x=29.06,y=7.00,z=-80.31})<=1) then
+					if not MIsCasting() or not MIsLoading() then
+						Player:MoveTo(29.06,7.00,-80.31)
+					end
+					
+				else
+					if MEntityList('contentid=1001976,maxdistance=25') then
+						Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1001976,nearest')))))
+						Player:Interact(Player:GetTarget().id)
+						if IsControlOpen("SelectString") and Player:GetTarget().contentid == 1001976 then
+							UseControlAction("SelectString", "SelectIndex", 0)
+						end
+					end	
+				end
+			else
+				if not  MIsCasting() then
+					Player:Teleport(9)
+				end
 			end
 		end		
 	end
