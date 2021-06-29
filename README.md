@@ -9,3 +9,4 @@ TODO / might do:  <br />
 -improve GUI (possibly with what its doing rather than true / false)<br />
 -better UI?<br />
 -some more test (is aetheryte unlocked, is inn quest prereq done, is gil > 1000 ?)
+-refacto ?
