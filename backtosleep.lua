@@ -14,13 +14,28 @@ backtosleep.GUI.visible = true
 backtosleep.GUI.hue = 125
 backtosleep.now = 0
 backtosleep.interact = 0
+backtosleep.move = 0
 local backtosleepteleportnow = backtosleep.now
 local backtosleepinteractnow = backtosleep.interact
+local backtosleepmovenow = backtosleep.move
 
 function backtosleep.ModuleInit()
 	backtosleep.CheckMenu()
 end
 
+
+function backtosleep.stopRunning()
+	backtosleep.runningroost = false
+	backtosleep.runningmizzen = false
+	backtosleep.runninghourglass = false
+	backtosleep.runningcloudnine = false
+	backtosleep.running = false
+	backtosleep.stopIfMoving()
+end
+
+
+function backtosleep.ToggleRun()
+end
 
 --Toggle Function 
 function backtosleep.ToggleRunRoost()
@@ -31,9 +46,7 @@ function backtosleep.ToggleRunRoost()
 	backtosleep.runningmizzen = false
 	backtosleep.runninghourglass = false
 	backtosleep.runningcloudnine = false
-	if Player:IsMoving() then
-		Player:Stop()
-	end
+	backtosleep.stopIfMoving()
 end
 
 function backtosleep.ToggleRunMizzen()
@@ -44,9 +57,7 @@ function backtosleep.ToggleRunMizzen()
 	backtosleep.runningroost = false
 	backtosleep.runninghourglass = false
 	backtosleep.runningcloudnine = false
-	if Player:IsMoving() then
-		Player:Stop()
-	end
+	backtosleep.stopIfMoving()
 end
 
 function backtosleep.ToggleRunHourglass()
@@ -57,9 +68,7 @@ function backtosleep.ToggleRunHourglass()
 	backtosleep.runningroost = false
 	backtosleep.runningmizzen = false
 	backtosleep.runningcloudnine = false
-	if Player:IsMoving() then
-		Player:Stop()
-	end
+	backtosleep.stopIfMoving()
 end
 
 function backtosleep.ToggleRunCloudNine()
@@ -70,10 +79,10 @@ function backtosleep.ToggleRunCloudNine()
 	backtosleep.runningroost = false
 	backtosleep.runningmizzen = false
 	backtosleep.runninghourglass = false
-	if Player:IsMoving() then
-		Player:Stop()
-	end
+	backtosleep.stopIfMoving()
 end
+
+
 
 
 
@@ -132,6 +141,11 @@ function backtosleep.Draw( event, ticks )
                 if GUI:IsItemClicked(togglecloudninesleep) then 
 					backtosleep.ToggleRunCloudNine()
                 end
+				GUI:NewLine()
+				local stoprunning = GUI:Button("Stop",400,50)
+                if GUI:IsItemClicked(stoprunning) then 
+					backtosleep.stopRunning()
+                end
             end
             GUI:End()
         end
@@ -139,216 +153,156 @@ function backtosleep.Draw( event, ticks )
 end
 
 
+function backtosleep.teleportTo(aetheryteID)
+	if TimeSince(backtosleepteleportnow) > 6000 then
+		if not  MIsCasting() then
+			Player:Teleport(aetheryteID)
+		end
+		backtosleepteleportnow = Now()
+		backtosleepmovenow = Now()
+	end
+end
+
+
+function backtosleep.bigAetheryteInteract(contentid,querystring)
+	if MEntityList("contentid="..tostring(contentid)..",maxdistance=25") then
+		if Player:GetTarget() == nil then
+			if TimeSince(backtosleepinteractnow) > 1000 then
+				Player:SetTarget(tonumber(tostring(next(MEntityList("contentid="..tostring(contentid)..",nearest")))))
+				backtosleepinteractnow = Now()
+			end
+		end
+		if not IsControlOpen("SelectString") and not (Player:GetTarget() == nil) then
+			if TimeSince(backtosleepinteractnow) > 1000 then
+				Player:Interact(Player:GetTarget().id)
+				backtosleepinteractnow = Now()
+			end
+		end
+		if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Aethernet." then
+			if TimeSince(backtosleepinteractnow) > 1000 then
+				UseControlAction("SelectString", "SelectIndex", 0)
+				backtosleepinteractnow = Now()
+			end
+		end
+		if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == querystring then
+			if TimeSince(backtosleepinteractnow) > 1000 then
+				UseControlAction("SelectString", "SelectIndex", 0)
+				backtosleepinteractnow = Now() 
+			end
+		end					
+	end
+end					
+
+
+function backtosleep.innGuyInteract(contentid)
+	if MEntityList("contentid="..tostring(contentid)..",maxdistance=25") then
+		if not IsControlOpen("SelectString") then
+			if TimeSince(backtosleepinteractnow) > 1000 then
+				Player:SetTarget(tonumber(tostring(next(MEntityList("contentid="..tostring(contentid)..",nearest")))))
+				Player:Interact(Player:GetTarget().id)
+				backtosleepinteractnow = Now()
+			end
+		else
+			if TimeSince(backtosleepinteractnow) > 2000 then
+				if IsControlOpen("SelectString") and Player:GetTarget().contentid == contentid then
+					UseControlAction("SelectString", "SelectIndex", 0)
+					backtosleepinteractnow = Now() - 2000
+				end
+			end
+		end
+	end	
+end
+
+function backtosleep.stopIfMoving()
+	if Player:IsMoving() then
+		Player:Stop()
+	end
+end
+
+function backtosleep.canMoveTo(posx,posy,posz)
+	if TimeSince(backtosleepmovenow) > 8000 then
+		if not MIsCasting() or not MIsLoading() then
+			Player:MoveTo(posx,posy,posz)
+		end
+	end
+end
+
+function backtosleep.cityBigAetheryteTravel(posx,posy,posz,deviation,aetheryteContentID,querystring)
+	if not (math.distance3d(Player.pos,{x= posx,y= posy, z= posz})<= deviation) then
+		backtosleep.canMoveTo(posx,posy,posz)
+	else
+		backtosleep.stopIfMoving()
+		backtosleep.bigAetheryteInteract(aetheryteContentID,querystring)
+	end
+
+end
+
+function backtosleep.innGuyTravel(posx,posy,posz,contentID)
+	if not (math.distance3d(Player.pos,{x=posx,y=posy,z=posz})<=1) then
+		backtosleep.canMoveTo(posx,posy,posz)
+	else
+		backtosleep.innGuyInteract(contentID)
+	end
+end
 
 
 function backtosleep.OnUpdateHandler( Event, ticks )	
 --ROOST
 	if backtosleep.runningroost then
-		--backtosleep.runningmizzen = false
 		if Player.localmapid == 179 then
-			backtosleep.runningroost = false
-			backtosleep.running = false
+			backtosleep.stopRunning()
 		elseif not (Player.localmapid == 132) then
-			if TimeSince(backtosleepteleportnow) > 6000 then
-				if not  MIsCasting() then
-					Player:Teleport(2)
-				end
-				backtosleepteleportnow = Now()
-			end
+			backtosleep.teleportTo(2)		
 		elseif (Player.localmapid == 132) then
-			if not (math.distance3d(Player.pos,{x=25.56,y=-8.00,z=97.94})<=1) then
-				if not MIsCasting() or not MIsLoading() then
-					Player:MoveTo(25.56,-8.00,97.94)
-				end
-			else
-				if MEntityList('contentid=1000102,maxdistance=25') then
-					if not IsControlOpen("SelectString") then
-						if TimeSince(backtosleepinteractnow) > 1000 then
-							Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1000102,nearest')))))
-							Player:Interact(Player:GetTarget().id)
-							backtosleepinteractnow = Now()
-						end
-					else
-						if TimeSince(backtosleepinteractnow) > 1000 then
-							if IsControlOpen("SelectString") and Player:GetTarget().contentid == 1000102 then
-								UseControlAction("SelectString", "SelectIndex", 0)
-							end
-						end
-					end
-				end	
-			end
+			backtosleep.innGuyTravel(25.56,-8.00,97.94,1000102)
 		end
 	end
 --MIZZENMAST	
 	if backtosleep.runningmizzen then
-		--backtosleep.runningroost = false
 		if Player.localmapid == 177 then
-			backtosleep.runningmizzen = false
-			backtosleep.running = false
+			backtosleep.stopRunning()
 		elseif not (Player.localmapid == 128) and not (Player.localmapid == 129) then
-			if TimeSince(backtosleepteleportnow) > 6000 then
-				if not  MIsCasting() then
-					Player:Teleport(8)
-				end
-				backtosleepteleportnow = Now()
-			end		
+			backtosleep.teleportTo(8)
 		elseif (Player.localmapid == 129) then
-			if not (math.distance3d(Player.pos,{x=-84.03,y=20.77,z=0.02})<=8) then
-				Player:MoveTo(-84.03,20.77,0.02)
-			else
-				if Player:IsMoving() then
-					Player:Stop()
-				end
-				if MEntityList('contentid=8,maxdistance=25') then
-					if Player:GetTarget() == nil then
-						if TimeSince(backtosleepinteractnow) > 500 then
-							Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=8,nearest')))))
-							backtosleepinteractnow = Now()
-						end
-					end
-					if not IsControlOpen("SelectString") and not (Player:GetTarget() == nil) then
-						if TimeSince(backtosleepinteractnow) > 1000 then
-							Player:Interact(Player:GetTarget().id)
-							backtosleepinteractnow = Now()
-						end
-					end
-					if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Aethernet." then
-						if TimeSince(backtosleepinteractnow) > 1000 then
-							UseControlAction("SelectString", "SelectIndex", 0)
-							backtosleepinteractnow = Now()
-						end						
-					end
-					if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "The Aftcastle." then
-						if TimeSince(backtosleepinteractnow) > 1000 then
-							UseControlAction("SelectString", "SelectIndex", 0)
-							backtosleepinteractnow = Now()
-						end								
-					end					
-				end
-			end
-			
+			backtosleep.cityBigAetheryteTravel(-84.03,20.77,0.02,8,8,"The Aftcastle.")
 		elseif (Player.localmapid == 128) then
-			if not (math.distance3d(Player.pos,{x=12.83,y=40.00,z=11.66})<=1) then
-				if not MIsCasting() or not MIsLoading() then
-					Player:MoveTo(12.83,40.00,11.66)
-				end
-				
-			else
-				if MEntityList('contentid=1000974,maxdistance=25') then					
-					if Player:GetTarget() == nil then
-						if TimeSince(backtosleepinteractnow) > 1000 then
-							Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1000974,nearest')))))
-							Player:Interact(Player:GetTarget().id)
-							backtosleepinteractnow = Now()
-						end
-					end
-					if IsControlOpen("SelectString") and Player:GetTarget().contentid == 1000974 then
-						if TimeSince(backtosleepinteractnow) > 1000 then
-							UseControlAction("SelectString", "SelectIndex", 0)
-							backtosleepinteractnow = Now()
-						end						
-					end
-				end	
-			end
+			backtosleep.innGuyTravel(12.83,40,11.66,1000974)
 		end		
 	end
 --HOURGLASS	
 	if backtosleep.runninghourglass then
-		--backtosleep.runningroost = false
 		if Player.localmapid == 178 then
-			backtosleep.runninghourglass = false
-			backtosleep.running = false
+			backtosleep.stopRunning()
 		elseif not (Player.localmapid == 130) then
-			if TimeSince(backtosleepteleportnow) > 6000 then
-				if not  MIsCasting() then
-					Player:Teleport(9)
-				end
-				backtosleepteleportnow = Now()
-			end
+			backtosleep.teleportTo(9)
 		elseif (Player.localmapid == 130) then
 			if math.distance3d(Player.pos,{x=-147.05,y=-3.15,z=-165.64})<=10 then
-				if not (math.distance3d(Player.pos,{x=-147.05,y=-3.15,z=-165.64})<=3) then
-					Player:MoveTo(-147.05,-3.15,-165.64)
-				else
-					if Player:IsMoving() then
-						Player:Stop()
-					end
-					if MEntityList('contentid=9,maxdistance=25') then
-						if Player:GetTarget() == nil then
-							if TimeSince(backtosleepinteractnow) > 1000 then
-								Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=9,nearest')))))
-								backtosleepinteractnow = Now()
-							end
-						end
-						if not IsControlOpen("SelectString") and not (Player:GetTarget() == nil) then
-							if TimeSince(backtosleepinteractnow) > 1000 then
-								Player:Interact(Player:GetTarget().id)
-								backtosleepinteractnow = Now()
-							end
-						end
-						if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Aethernet." then
-							if TimeSince(backtosleepinteractnow) > 1000 then
-								UseControlAction("SelectString", "SelectIndex", 0)
-								backtosleepinteractnow = Now()
-							end
-						end
-						if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Adventurers' Guild." then
-							if TimeSince(backtosleepinteractnow) > 1000 then
-								UseControlAction("SelectString", "SelectIndex", 0)
-								backtosleepinteractnow = Now()
-							end
-						end					
-					end
-				end
+				backtosleep.cityBigAetheryteTravel(-147.05,-3.15,-165.64,3,9,"Adventurers' Guild.")
 			elseif math.distance3d(Player.pos,{x=39.32,y=8.00,z=-98.18})<=40 then
-				if not (math.distance3d(Player.pos,{x=29.06,y=7.00,z=-80.31})<=1) then
-					if not MIsCasting() or not MIsLoading() then
-						Player:MoveTo(29.06,7.00,-80.31)
-					end
-					
-				else
-					if MEntityList('contentid=1001976,maxdistance=25') then
-						if Player:GetTarget() == nil then
-							if TimeSince(backtosleepinteractnow) > 1000 then
-								Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1001976,nearest')))))
-								Player:Interact(Player:GetTarget().id)
-								backtosleepinteractnow = Now()
-							end
-						end
-						if IsControlOpen("SelectString") and Player:GetTarget().contentid == 1001976 then
-							if TimeSince(backtosleepinteractnow) > 1000 then						
-								UseControlAction("SelectString", "SelectIndex", 0)
-								backtosleepinteractnow = Now()
-							end
-						end
-					end	
-				end
+				backtosleep.innGuyTravel(29.06,7.00,-80.31,1001976)				
 			else
-				if TimeSince(backtosleepteleportnow) > 6000 then			
-					if not  MIsCasting() then
-						Player:Teleport(9)
-					end
-					backtosleepteleportnow = Now()					
-				end
+				backtosleep.teleportTo(9)
 			end
 		end		
 	end
 --CloudNine
 	if backtosleep.runningcloudnine then
-		d(backtosleepteleportnow)
-		if TimeSince(backtosleepteleportnow) > 5000 then
-			if not  MIsCasting() then
-				Player:Teleport(70)
+		if Player.localmapid == 429 then
+			backtosleep.stopRunning()
+		elseif not (Player.localmapid == 418) then
+			backtosleep.teleportTo(70)
+		elseif (Player.localmapid == 418) then
+			if math.distance3d(Player.pos,{x=-63.98,y=11.15,z=43.99})<=15 then
+				backtosleep.cityBigAetheryteTravel(-63.98,11.15,43.99,8,70,"The Forgotten Knight.")
+			elseif math.distance3d(Player.pos,{x=66.40,y=23.98,z=18.08})<=40 then
+				backtosleep.innGuyTravel(84.83,15.09,33.61,1011193)												
+			else
+				backtosleep.teleportTo(70)
 			end
-			backtosleepteleportnow = Now()
-		end
-		
-
+		end		
 	end
 end
 
 RegisterEventHandler("Gameloop.Update",backtosleep.OnUpdateHandler)
---RegisterEventHandler("backtosleep.TOGGLE", backtosleep.ToggleRun) 
 RegisterEventHandler("Module.Initalize",backtosleep.ModuleInit) 
 RegisterEventHandler("Gameloop.Draw", backtosleep.Draw, "backtosleep Draw")
-
