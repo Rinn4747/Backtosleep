@@ -5,12 +5,17 @@ backtosleep= { }
 backtosleep.runningroost = false
 backtosleep.runningmizzen = false
 backtosleep.runninghourglass = false
+backtosleep.runningcloudnine = false
 backtosleep.running = false
 backtosleep.lastticks = 0
 backtosleep.GUI = {}
 backtosleep.GUI.open = true
 backtosleep.GUI.visible = true
 backtosleep.GUI.hue = 125
+backtosleep.now = 0
+backtosleep.interact = 0
+local backtosleepteleportnow = backtosleep.now
+local backtosleepinteractnow = backtosleep.interact
 
 function backtosleep.ModuleInit()
 	backtosleep.CheckMenu()
@@ -25,6 +30,7 @@ function backtosleep.ToggleRunRoost()
 	-- the others
 	backtosleep.runningmizzen = false
 	backtosleep.runninghourglass = false
+	backtosleep.runningcloudnine = false
 	if Player:IsMoving() then
 		Player:Stop()
 	end
@@ -37,6 +43,7 @@ function backtosleep.ToggleRunMizzen()
 	-- the others
 	backtosleep.runningroost = false
 	backtosleep.runninghourglass = false
+	backtosleep.runningcloudnine = false
 	if Player:IsMoving() then
 		Player:Stop()
 	end
@@ -49,6 +56,20 @@ function backtosleep.ToggleRunHourglass()
 	-- the others
 	backtosleep.runningroost = false
 	backtosleep.runningmizzen = false
+	backtosleep.runningcloudnine = false
+	if Player:IsMoving() then
+		Player:Stop()
+	end
+end
+
+function backtosleep.ToggleRunCloudNine()
+    backtosleep.runningcloudnine = not backtosleep.runningcloudnine
+	backtosleep.running = not backtosleep.running
+	
+	-- the others
+	backtosleep.runningroost = false
+	backtosleep.runningmizzen = false
+	backtosleep.runninghourglass = false
 	if Player:IsMoving() then
 		Player:Stop()
 	end
@@ -86,14 +107,14 @@ function backtosleep.Draw( event, ticks )
             backtosleep.GUI.visible, backtosleep.GUI.open = GUI:Begin("backtosleep", backtosleep.GUI.open)
             if ( backtosleep.GUI.visible ) then
                 backtosleep.Enable,changed = GUI:Checkbox("Enable##Enable", backtosleep.Enable)
-				GUI:InputTextEditor([[##State]], tostring(backtosleep.running),400,50,(GUI.InputTextFlags_ReadOnly))
+				GUI:InputTextEditor([[##State]], "Currently running : "..tostring(backtosleep.running),400,50,(GUI.InputTextFlags_ReadOnly))
+				GUI:SameLine()
 				GUI:NewLine()
 				local toggleroostsleep = GUI:Button("Roost Inn",100,20)
                 if GUI:IsItemClicked(toggleroostsleep) then 
 					backtosleep.ToggleRunRoost()
                 end
 				GUI:SameLine()
-				--GUI:InputText([[##StateRoost]], tostring(backtosleep.runningroost), (GUI.InputTextFlags_ReadOnly),100,20)
 				GUI:NewLine()
 				local togglemizzensleep = GUI:Button("Mizzenmast",100,20)
                 if GUI:IsItemClicked(togglemizzensleep) then 
@@ -105,7 +126,12 @@ function backtosleep.Draw( event, ticks )
                 if GUI:IsItemClicked(togglehourglasssleep) then 
 					backtosleep.ToggleRunHourglass()
                 end
-				--GUI:InputText([[##StateMizzen]], tostring(backtosleep.runningmizzen), (GUI.InputTextFlags_ReadOnly),100,20)
+				GUI:SameLine()
+				GUI:NewLine()
+				local togglecloudninesleep = GUI:Button("CloudNine",100,20)
+                if GUI:IsItemClicked(togglecloudninesleep) then 
+					backtosleep.ToggleRunCloudNine()
+                end
             end
             GUI:End()
         end
@@ -113,7 +139,9 @@ function backtosleep.Draw( event, ticks )
 end
 
 
-function backtosleep.OnUpdateHandler( Event, ticks )
+
+
+function backtosleep.OnUpdateHandler( Event, ticks )	
 --ROOST
 	if backtosleep.runningroost then
 		--backtosleep.runningmizzen = false
@@ -121,8 +149,11 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			backtosleep.runningroost = false
 			backtosleep.running = false
 		elseif not (Player.localmapid == 132) then
-			if not  MIsCasting() then
-				Player:Teleport(2)
+			if TimeSince(backtosleepteleportnow) > 6000 then
+				if not  MIsCasting() then
+					Player:Teleport(2)
+				end
+				backtosleepteleportnow = Now()
 			end
 		elseif (Player.localmapid == 132) then
 			if not (math.distance3d(Player.pos,{x=25.56,y=-8.00,z=97.94})<=1) then
@@ -131,10 +162,18 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 				end
 			else
 				if MEntityList('contentid=1000102,maxdistance=25') then
-					Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1000102,nearest')))))
-					Player:Interact(Player:GetTarget().id)
-					if IsControlOpen("SelectString") and Player:GetTarget().contentid == 1000102 then
-						UseControlAction("SelectString", "SelectIndex", 0)
+					if not IsControlOpen("SelectString") then
+						if TimeSince(backtosleepinteractnow) > 1000 then
+							Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1000102,nearest')))))
+							Player:Interact(Player:GetTarget().id)
+							backtosleepinteractnow = Now()
+						end
+					else
+						if TimeSince(backtosleepinteractnow) > 1000 then
+							if IsControlOpen("SelectString") and Player:GetTarget().contentid == 1000102 then
+								UseControlAction("SelectString", "SelectIndex", 0)
+							end
+						end
 					end
 				end	
 			end
@@ -147,9 +186,12 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			backtosleep.runningmizzen = false
 			backtosleep.running = false
 		elseif not (Player.localmapid == 128) and not (Player.localmapid == 129) then
-			if not  MIsCasting() then
-				Player:Teleport(8)
-			end
+			if TimeSince(backtosleepteleportnow) > 6000 then
+				if not  MIsCasting() then
+					Player:Teleport(8)
+				end
+				backtosleepteleportnow = Now()
+			end		
 		elseif (Player.localmapid == 129) then
 			if not (math.distance3d(Player.pos,{x=-84.03,y=20.77,z=0.02})<=8) then
 				Player:MoveTo(-84.03,20.77,0.02)
@@ -159,16 +201,28 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 				end
 				if MEntityList('contentid=8,maxdistance=25') then
 					if Player:GetTarget() == nil then
-						Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=8,nearest')))))
+						if TimeSince(backtosleepinteractnow) > 500 then
+							Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=8,nearest')))))
+							backtosleepinteractnow = Now()
+						end
 					end
 					if not IsControlOpen("SelectString") and not (Player:GetTarget() == nil) then
-						Player:Interact(Player:GetTarget().id)
+						if TimeSince(backtosleepinteractnow) > 1000 then
+							Player:Interact(Player:GetTarget().id)
+							backtosleepinteractnow = Now()
+						end
 					end
 					if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Aethernet." then
-						UseControlAction("SelectString", "SelectIndex", 0)
+						if TimeSince(backtosleepinteractnow) > 1000 then
+							UseControlAction("SelectString", "SelectIndex", 0)
+							backtosleepinteractnow = Now()
+						end						
 					end
 					if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "The Aftcastle." then
-						UseControlAction("SelectString", "SelectIndex", 0)
+						if TimeSince(backtosleepinteractnow) > 1000 then
+							UseControlAction("SelectString", "SelectIndex", 0)
+							backtosleepinteractnow = Now()
+						end								
 					end					
 				end
 			end
@@ -180,11 +234,19 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 				end
 				
 			else
-				if MEntityList('contentid=1000974,maxdistance=25') then
-					Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1000974,nearest')))))
-					Player:Interact(Player:GetTarget().id)
+				if MEntityList('contentid=1000974,maxdistance=25') then					
+					if Player:GetTarget() == nil then
+						if TimeSince(backtosleepinteractnow) > 1000 then
+							Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1000974,nearest')))))
+							Player:Interact(Player:GetTarget().id)
+							backtosleepinteractnow = Now()
+						end
+					end
 					if IsControlOpen("SelectString") and Player:GetTarget().contentid == 1000974 then
-						UseControlAction("SelectString", "SelectIndex", 0)
+						if TimeSince(backtosleepinteractnow) > 1000 then
+							UseControlAction("SelectString", "SelectIndex", 0)
+							backtosleepinteractnow = Now()
+						end						
 					end
 				end	
 			end
@@ -197,8 +259,11 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			backtosleep.runninghourglass = false
 			backtosleep.running = false
 		elseif not (Player.localmapid == 130) then
-			if not  MIsCasting() then
-				Player:Teleport(9)
+			if TimeSince(backtosleepteleportnow) > 6000 then
+				if not  MIsCasting() then
+					Player:Teleport(9)
+				end
+				backtosleepteleportnow = Now()
 			end
 		elseif (Player.localmapid == 130) then
 			if math.distance3d(Player.pos,{x=-147.05,y=-3.15,z=-165.64})<=10 then
@@ -208,18 +273,30 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 					if Player:IsMoving() then
 						Player:Stop()
 					end
-					if MEntityList('contentid=8,maxdistance=25') then
+					if MEntityList('contentid=9,maxdistance=25') then
 						if Player:GetTarget() == nil then
-							Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=8,nearest')))))
+							if TimeSince(backtosleepinteractnow) > 1000 then
+								Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=9,nearest')))))
+								backtosleepinteractnow = Now()
+							end
 						end
 						if not IsControlOpen("SelectString") and not (Player:GetTarget() == nil) then
-							Player:Interact(Player:GetTarget().id)
+							if TimeSince(backtosleepinteractnow) > 1000 then
+								Player:Interact(Player:GetTarget().id)
+								backtosleepinteractnow = Now()
+							end
 						end
 						if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Aethernet." then
-							UseControlAction("SelectString", "SelectIndex", 0)
+							if TimeSince(backtosleepinteractnow) > 1000 then
+								UseControlAction("SelectString", "SelectIndex", 0)
+								backtosleepinteractnow = Now()
+							end
 						end
-						if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "The Aftcastle." then
-							UseControlAction("SelectString", "SelectIndex", 0)
+						if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Adventurers' Guild." then
+							if TimeSince(backtosleepinteractnow) > 1000 then
+								UseControlAction("SelectString", "SelectIndex", 0)
+								backtosleepinteractnow = Now()
+							end
 						end					
 					end
 				end
@@ -231,19 +308,42 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 					
 				else
 					if MEntityList('contentid=1001976,maxdistance=25') then
-						Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1001976,nearest')))))
-						Player:Interact(Player:GetTarget().id)
+						if Player:GetTarget() == nil then
+							if TimeSince(backtosleepinteractnow) > 1000 then
+								Player:SetTarget(tonumber(tostring(next(MEntityList('contentid=1001976,nearest')))))
+								Player:Interact(Player:GetTarget().id)
+								backtosleepinteractnow = Now()
+							end
+						end
 						if IsControlOpen("SelectString") and Player:GetTarget().contentid == 1001976 then
-							UseControlAction("SelectString", "SelectIndex", 0)
+							if TimeSince(backtosleepinteractnow) > 1000 then						
+								UseControlAction("SelectString", "SelectIndex", 0)
+								backtosleepinteractnow = Now()
+							end
 						end
 					end	
 				end
 			else
-				if not  MIsCasting() then
-					Player:Teleport(9)
+				if TimeSince(backtosleepteleportnow) > 6000 then			
+					if not  MIsCasting() then
+						Player:Teleport(9)
+					end
+					backtosleepteleportnow = Now()					
 				end
 			end
 		end		
+	end
+--CloudNine
+	if backtosleep.runningcloudnine then
+		d(backtosleepteleportnow)
+		if TimeSince(backtosleepteleportnow) > 5000 then
+			if not  MIsCasting() then
+				Player:Teleport(70)
+			end
+			backtosleepteleportnow = Now()
+		end
+		
+
 	end
 end
 
@@ -251,3 +351,4 @@ RegisterEventHandler("Gameloop.Update",backtosleep.OnUpdateHandler)
 --RegisterEventHandler("backtosleep.TOGGLE", backtosleep.ToggleRun) 
 RegisterEventHandler("Module.Initalize",backtosleep.ModuleInit) 
 RegisterEventHandler("Gameloop.Draw", backtosleep.Draw, "backtosleep Draw")
+
