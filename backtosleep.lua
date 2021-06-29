@@ -110,37 +110,37 @@ function backtosleep.Draw( event, ticks )
 				GUI:InputTextEditor([[##State]], "Currently running : "..tostring(backtosleep.running),400,50,(GUI.InputTextFlags_ReadOnly))
 				GUI:SameLine()
 				GUI:NewLine()
-				local toggleroostsleep = GUI:Button("Roost Inn",100,20)
+				local toggleroostsleep = GUI:Button("Gridania",100,20)
                 if GUI:IsItemClicked(toggleroostsleep) then 
 					backtosleep.ToggleRunRoost()
                 end
 				GUI:SameLine()
 				GUI:NewLine()
-				local togglemizzensleep = GUI:Button("Mizzenmast",100,20)
+				local togglemizzensleep = GUI:Button("Limsa",100,20)
                 if GUI:IsItemClicked(togglemizzensleep) then 
 					backtosleep.ToggleRunMizzen()
                 end
 				GUI:SameLine()
 				GUI:NewLine()
-				local togglehourglasssleep = GUI:Button("Hourglass",100,20)
+				local togglehourglasssleep = GUI:Button("Ul'dah",100,20)
                 if GUI:IsItemClicked(togglehourglasssleep) then 
 					backtosleep.ToggleRunHourglass()
                 end
 				GUI:SameLine()
 				GUI:NewLine()
-				local togglecloudninesleep = GUI:Button("CloudNine",100,20)
+				local togglecloudninesleep = GUI:Button("Ishgard",100,20)
                 if GUI:IsItemClicked(togglecloudninesleep) then 
 					backtosleep.ToggleRunCloudNine()
                 end
 				GUI:SameLine()
 				GUI:NewLine()
-				local togglebokairoinn = GUI:Button("Bokairo",100,20)
+				local togglebokairoinn = GUI:Button("Kugane",100,20)
                 if GUI:IsItemClicked(togglebokairoinn) then 
 					backtosleep.ToggleRunBokairoInn()
                 end
 				GUI:SameLine()
 				GUI:NewLine()
-				local togglethependants = GUI:Button("The Pendants",100,20)
+				local togglethependants = GUI:Button("Crystarium",100,20)
                 if GUI:IsItemClicked(togglethependants) then 
 					backtosleep.ToggleRunThePendants()
                 end				
