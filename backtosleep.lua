@@ -6,6 +6,8 @@ backtosleep.runningroost = false
 backtosleep.runningmizzen = false
 backtosleep.runninghourglass = false
 backtosleep.runningcloudnine = false
+backtosleep.runningbokairoinn = false
+backtosleep.runningthependants = false
 backtosleep.running = false
 backtosleep.lastticks = 0
 backtosleep.GUI = {}
@@ -29,59 +31,47 @@ function backtosleep.stopRunning()
 	backtosleep.runningmizzen = false
 	backtosleep.runninghourglass = false
 	backtosleep.runningcloudnine = false
+	backtosleep.runningbokairoinn = false
+	backtosleep.runningthependants = false
 	backtosleep.running = false
 	backtosleep.stopIfMoving()
 end
 
 
-function backtosleep.ToggleRun()
+function backtosleep.ToggleRun(string)
+	if backtosleep["running"..string] then
+		backtosleep.stopRunning()
+	else
+		backtosleep.stopRunning()
+		backtosleep["running"..string] = true
+		backtosleep.running = true
+	end
 end
 
 --Toggle Function 
 function backtosleep.ToggleRunRoost()
-    backtosleep.runningroost = not backtosleep.runningroost
-	backtosleep.running = not backtosleep.running
-	
-	-- the others
-	backtosleep.runningmizzen = false
-	backtosleep.runninghourglass = false
-	backtosleep.runningcloudnine = false
-	backtosleep.stopIfMoving()
+	backtosleep.ToggleRun("roost")
 end
 
 function backtosleep.ToggleRunMizzen()
-    backtosleep.runningmizzen = not backtosleep.runningmizzen
-	backtosleep.running = not backtosleep.running
-	
-	-- the others
-	backtosleep.runningroost = false
-	backtosleep.runninghourglass = false
-	backtosleep.runningcloudnine = false
-	backtosleep.stopIfMoving()
+	backtosleep.ToggleRun("mizzen")
 end
 
 function backtosleep.ToggleRunHourglass()
-    backtosleep.runninghourglass = not backtosleep.runninghourglass
-	backtosleep.running = not backtosleep.running
-	
-	-- the others
-	backtosleep.runningroost = false
-	backtosleep.runningmizzen = false
-	backtosleep.runningcloudnine = false
-	backtosleep.stopIfMoving()
+	backtosleep.ToggleRun("hourglass")
 end
 
 function backtosleep.ToggleRunCloudNine()
-    backtosleep.runningcloudnine = not backtosleep.runningcloudnine
-	backtosleep.running = not backtosleep.running
-	
-	-- the others
-	backtosleep.runningroost = false
-	backtosleep.runningmizzen = false
-	backtosleep.runninghourglass = false
-	backtosleep.stopIfMoving()
+	backtosleep.ToggleRun("cloudnine")
 end
 
+function backtosleep.ToggleRunBokairoInn()
+	backtosleep.ToggleRun("bokairoinn")
+end
+
+function backtosleep.ToggleRunThePendants()
+	backtosleep.ToggleRun("thependants")
+end
 
 
 
@@ -141,6 +131,18 @@ function backtosleep.Draw( event, ticks )
                 if GUI:IsItemClicked(togglecloudninesleep) then 
 					backtosleep.ToggleRunCloudNine()
                 end
+				GUI:SameLine()
+				GUI:NewLine()
+				local togglebokairoinn = GUI:Button("Bokairo",100,20)
+                if GUI:IsItemClicked(togglebokairoinn) then 
+					backtosleep.ToggleRunBokairoInn()
+                end
+				GUI:SameLine()
+				GUI:NewLine()
+				local togglethependants = GUI:Button("The Pendants",100,20)
+                if GUI:IsItemClicked(togglethependants) then 
+					backtosleep.ToggleRunThePendants()
+                end				
 				GUI:NewLine()
 				local stoprunning = GUI:Button("Stop",400,50)
                 if GUI:IsItemClicked(stoprunning) then 
@@ -178,18 +180,27 @@ function backtosleep.bigAetheryteInteract(contentid,querystring)
 				backtosleepinteractnow = Now()
 			end
 		end
+		
+			
 		if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Aethernet." then
 			if TimeSince(backtosleepinteractnow) > 1000 then
 				UseControlAction("SelectString", "SelectIndex", 0)
 				backtosleepinteractnow = Now()
 			end
 		end
-		if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == querystring then
-			if TimeSince(backtosleepinteractnow) > 1000 then
-				UseControlAction("SelectString", "SelectIndex", 0)
-				backtosleepinteractnow = Now() 
+		if GetControl("SelectString") ~= nil then
+			if GetControl("SelectString"):GetData() ~= nil then
+				if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[#GetControl("SelectString"):GetData()] == "Quit." then
+					if TimeSince(backtosleepinteractnow) > 1000 then
+						local currentaetherytequery = GetControl("SelectString"):GetData()
+						local currentindex = table.find(currentaetherytequery, querystring )
+						UseControlAction("SelectString", "SelectIndex", currentindex)
+						backtosleepinteractnow = Now() 
+					end
+				end
 			end
-		end					
+		end
+		
 	end
 end					
 
@@ -298,6 +309,38 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 				backtosleep.innGuyTravel(84.83,15.09,33.61,1011193)												
 			else
 				backtosleep.teleportTo(70)
+			end
+		end		
+	end
+--BokairoInn
+	if backtosleep.runningbokairoinn then
+		if Player.localmapid == 629 then
+			backtosleep.stopRunning()
+		elseif not (Player.localmapid == 628) then
+			backtosleep.teleportTo(111)
+		elseif (Player.localmapid == 628) then
+			if math.distance3d(Player.pos,{x=47.5,y=8.44,z=-37.31})<=15 then
+				backtosleep.cityBigAetheryteTravel(47.5,8.44,-37.31,8,111,"Bokairo Inn.")
+			elseif math.distance3d(Player.pos,{x=-84.73,y=18.05,z=-181.11})<=25 then
+				backtosleep.innGuyTravel(-85.85,19.00,-198.99,1018981)												
+			else
+				backtosleep.teleportTo(111)
+			end
+		end		
+	end
+--ThePendants	
+	if backtosleep.runningthependants then
+		if Player.localmapid == 843 then
+			backtosleep.stopRunning()
+		elseif not (Player.localmapid == 819) then
+			backtosleep.teleportTo(133)
+		elseif (Player.localmapid == 819) then
+			if math.distance3d(Player.pos,{x=-65.02,y=4.53,z=0.02})<=15 then
+				backtosleep.cityBigAetheryteTravel(-65.02,4.53,0.02,9,133,"The Pendants.")
+			elseif math.distance3d(Player.pos,{x=52.74,y=1.71,z=232.94})<=25 then
+				backtosleep.innGuyTravel(62.71,1.72,247.85,1027231)												
+			else
+				backtosleep.teleportTo(133)
 			end
 		end		
 	end
