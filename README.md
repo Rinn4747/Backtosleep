@@ -7,5 +7,5 @@ TODO / might do:  <br />
 -add other Inn, Namely Uldah, Ishgard, Kugane and Crystarium ones<br />
 -move to fc chest / market / retainer bell<br />
 -improve GUI (possibly with what its doing rather than true / false)<br />
--better UI?
+-better UI?<br />
 -some more test (is aetheryte unlocked, is inn quest prereq done, is gil > 1000 ?)
