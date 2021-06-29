@@ -1,5 +1,6 @@
---using Kitanoi snippet from discord
+--using Kitanoi draw function / menu snippet from discord #lua-help
 --Rinn#4747
+--v0.0.6
 
 backtosleep= { }
 backtosleep.runningroost = false
