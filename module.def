@@ -1,0 +1,6 @@
+[Module]
+Name=Backtosleep
+Version=1
+Files=backtosleep.lua
+Enabled=1
+Dependencies=minionlib  
