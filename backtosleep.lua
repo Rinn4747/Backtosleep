@@ -1,6 +1,6 @@
 --using Kitanoi draw function / menu snippet from discord #lua-help
 --Rinn#4747
---v0.0.7
+--v0.0.8
 
 backtosleep= { }
 backtosleep.runningroost = false
@@ -9,6 +9,8 @@ backtosleep.runninghourglass = false
 backtosleep.runningcloudnine = false
 backtosleep.runningbokairoinn = false
 backtosleep.runningthependants = false
+backtosleep.runningfclimsa = false
+backtosleep.runningcentrallimsa = false
 backtosleep.running = false
 backtosleep.lastticks = 0
 backtosleep.GUI = {}
@@ -18,9 +20,13 @@ backtosleep.GUI.hue = 125
 backtosleep.now = 0
 backtosleep.interact = 0
 backtosleep.move = 0
+backtosleep.mapid = 0
+backtosleep.randompoint = {}
 local backtosleepteleportnow = backtosleep.now
 local backtosleepinteractnow = backtosleep.interact
 local backtosleepmovenow = backtosleep.move
+local backtosleepmapid = backtosleep.mapid
+local backtosleeprandompoint = backtosleep.randompoint
 
 function backtosleep.ModuleInit()
 	backtosleep.CheckMenu()
@@ -34,6 +40,8 @@ function backtosleep.stopRunning()
 	backtosleep.runningcloudnine = false
 	backtosleep.runningbokairoinn = false
 	backtosleep.runningthependants = false
+	backtosleep.runningfclimsa = false
+	backtosleep.runningcentrallimsa = false
 	backtosleep.running = false
 	backtosleep.stopIfMoving()
 end
@@ -72,6 +80,14 @@ end
 
 function backtosleep.ToggleRunThePendants()
 	backtosleep.ToggleRun("thependants")
+end
+
+function backtosleep.ToggleRunfclimsa()
+	backtosleep.ToggleRun("fclimsa")
+end
+
+function backtosleep.ToggleRuncentrallimsa()
+	backtosleep.ToggleRun("centrallimsa")
 end
 
 
@@ -121,6 +137,16 @@ function backtosleep.Draw( event, ticks )
 					backtosleep.ToggleRunMizzen()
                 end
 				GUI:SameLine()
+				local togglefclimsasleep = GUI:Button("FC Chest",100,20)
+                if GUI:IsItemClicked(togglefclimsasleep) then 
+					backtosleep.ToggleRunfclimsa()
+                end
+				GUI:SameLine()
+				local togglecentrallimsasleep = GUI:Button("Aetheryte",100,20)
+                if GUI:IsItemClicked(togglecentrallimsasleep) then 
+					backtosleep.ToggleRuncentrallimsa()
+                end
+				GUI:SameLine()				
 				GUI:NewLine()
 				local togglehourglasssleep = GUI:Button("Ul'dah",100,20)
                 if GUI:IsItemClicked(togglehourglasssleep) then 
@@ -203,7 +229,9 @@ function backtosleep.bigAetheryteInteract(contentid,querystring)
 		end
 		
 	end
-end					
+end
+
+					
 
 
 function backtosleep.innGuyInteract(contentid)
@@ -239,6 +267,25 @@ function backtosleep.canMoveTo(posx,posy,posz)
 	end
 end
 
+function backtosleep.randomMoveTo(posx,posy,posz,min,max)
+	if not (backtosleepmapid == Player.localmapid) then
+		backtosleeprandompoint = nil
+		backtosleepmapid = Player.localmapid
+	else
+		if backtosleeprandompoint == nil then
+			d("posx = "..tostring(posx).."          posy = "..tostring(posy).."             posz = "..tostring(posz).."          min = "..tostring(min).." max = "..tostring(max))
+			backtosleeprandompoint = NavigationManager:GetRandomPointOnCircle(posx,posy,posz,min,max)
+			if not (backtosleeprandompoint == nil) then
+				d("randx: "..tostring(backtosleeprandompoint.x).." randy: "..tostring(backtosleeprandompoint.y).." randz: "..tostring(backtosleeprandompoint.z))
+			end
+		else
+			backtosleep.canMoveTo(backtosleeprandompoint.x,backtosleeprandompoint.y,backtosleeprandompoint.z)
+		end
+	end
+end
+
+
+
 function backtosleep.cityBigAetheryteTravel(posx,posy,posz,deviation,aetheryteContentID,querystring)
 	if not (math.distance3d(Player.pos,{x= posx,y= posy, z= posz})<= deviation) then
 		backtosleep.canMoveTo(posx,posy,posz)
@@ -248,6 +295,16 @@ function backtosleep.cityBigAetheryteTravel(posx,posy,posz,deviation,aetheryteCo
 	end
 
 end
+
+function backtosleep.cityBigAetheryteTeleport(posx,posy,posz,deviation)
+	if not (math.distance3d(Player.pos,{x= posx,y= posy, z= posz})<= deviation) then
+		backtosleep.canMoveTo(posx,posy,posz)
+	else
+		backtosleep.stopIfMoving()
+	end
+
+end
+
 
 function backtosleep.innGuyTravel(posx,posy,posz,contentID)
 	if not (math.distance3d(Player.pos,{x=posx,y=posy,z=posz})<=1) then
@@ -345,6 +402,35 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			end
 		end		
 	end
+--FC Chest Limsa
+	if backtosleep.runningfclimsa then
+		if Player.localmapid == 129 and math.distance3d(Player.pos,{x=-199.58,y=16.00,z=57.51})<=8 then
+			if not Player:IsMoving() then
+				backtosleep.stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		elseif not (Player.localmapid == 129) then
+			backtosleep.teleportTo(8)
+		elseif (Player.localmapid == 129) then
+			if math.distance3d(Player.pos,{x=-84.03,y=20.77,z=0.02})<=20 then
+				backtosleep.cityBigAetheryteTravel(-84.03,20.77,0.02,8,8,"Hawkers' Alley.")
+			elseif math.distance3d(Player.pos,{x=-201.49,y=15.98,z=50.6})<=25 then
+				backtosleep.randomMoveTo(-199.58,16.00,57.51,0,6)				
+			else
+				backtosleep.teleportTo(8)
+			end
+		end		
+	end
+--Central Aetheryte Limsa
+	if backtosleep.runningcentrallimsa then
+		if math.distance3d(Player.pos,{x=-84.03,y=20.77,z=0.02})<=20 then
+			backtosleep.cityBigAetheryteTeleport(-84.03,20.77,0.02,8)
+		else
+			backtosleep.teleportTo(8)
+		end
+				
+	end	
 end
 
 RegisterEventHandler("Gameloop.Update",backtosleep.OnUpdateHandler)
