@@ -1,6 +1,6 @@
 --using Kitanoi draw function / menu snippet from discord #lua-help
 --Rinn#4747
---v0.0.8
+--v0.0.9
 
 backtosleep= { }
 backtosleep.runningroost = false
@@ -11,6 +11,10 @@ backtosleep.runningbokairoinn = false
 backtosleep.runningthependants = false
 backtosleep.runningfclimsa = false
 backtosleep.runningcentrallimsa = false
+backtosleep.runningmblimsa = false
+backtosleep.runningmbkugane = false
+backtosleep.runninglevekugane = false
+backtosleep.runninglevecrystarium = false
 backtosleep.running = false
 backtosleep.lastticks = 0
 backtosleep.GUI = {}
@@ -42,6 +46,10 @@ function backtosleep.stopRunning()
 	backtosleep.runningthependants = false
 	backtosleep.runningfclimsa = false
 	backtosleep.runningcentrallimsa = false
+	backtosleep.runningmblimsa = false
+	backtosleep.runningmbkugane = false
+	backtosleep.runninglevekugane = false
+	backtosleep.runninglevecrystarium = false
 	backtosleep.running = false
 	backtosleep.stopIfMoving()
 end
@@ -89,6 +97,23 @@ end
 function backtosleep.ToggleRuncentrallimsa()
 	backtosleep.ToggleRun("centrallimsa")
 end
+
+function backtosleep.ToggleRunmblimsa()
+	backtosleep.ToggleRun("mblimsa")
+end
+
+function backtosleep.ToggleRunmbkugane()
+	backtosleep.ToggleRun("mbkugane")
+end
+
+function backtosleep.ToggleRunlevekugane()
+	backtosleep.ToggleRun("levekugane")
+end
+
+function backtosleep.ToggleRunlevecrystarium()
+	backtosleep.ToggleRun("levecrystarium")
+end
+
 
 
 
@@ -142,10 +167,15 @@ function backtosleep.Draw( event, ticks )
 					backtosleep.ToggleRunfclimsa()
                 end
 				GUI:SameLine()
-				local togglecentrallimsasleep = GUI:Button("Aetheryte",100,20)
+				local togglecentrallimsasleep = GUI:Button("WorldHop",100,20)
                 if GUI:IsItemClicked(togglecentrallimsasleep) then 
 					backtosleep.ToggleRuncentrallimsa()
                 end
+				GUI:SameLine()
+				local togglemblimsasleep = GUI:Button("Marketboard",100,20)
+                if GUI:IsItemClicked(togglemblimsasleep) then 
+					backtosleep.ToggleRunmblimsa()
+                end					
 				GUI:SameLine()				
 				GUI:NewLine()
 				local togglehourglasssleep = GUI:Button("Ul'dah",100,20)
@@ -165,11 +195,26 @@ function backtosleep.Draw( event, ticks )
 					backtosleep.ToggleRunBokairoInn()
                 end
 				GUI:SameLine()
+				local togglelevekugane = GUI:Button("Leves",100,20)
+                if GUI:IsItemClicked(togglelevekugane) then 
+					backtosleep.ToggleRunlevekugane()
+                end
+				GUI:SameLine()
+				local togglembkugane = GUI:Button("Marketboard",100,20)
+                if GUI:IsItemClicked(togglembkugane) then 
+					backtosleep.ToggleRunmbkugane()
+                end
+				GUI:SameLine()
 				GUI:NewLine()
 				local togglethependants = GUI:Button("Crystarium",100,20)
                 if GUI:IsItemClicked(togglethependants) then 
 					backtosleep.ToggleRunThePendants()
-                end				
+                end
+				GUI:SameLine()
+				local togglelevecrystarium = GUI:Button("Leves",100,20)
+                if GUI:IsItemClicked(togglelevecrystarium) then 
+					backtosleep.ToggleRunlevecrystarium()
+                end
 				GUI:NewLine()
 				local stoprunning = GUI:Button("Stop",400,50)
                 if GUI:IsItemClicked(stoprunning) then 
@@ -301,6 +346,7 @@ function backtosleep.cityBigAetheryteTeleport(posx,posy,posz,deviation)
 		backtosleep.canMoveTo(posx,posy,posz)
 	else
 		backtosleep.stopIfMoving()
+		backtosleep.stopRunning()
 	end
 
 end
@@ -425,12 +471,121 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 --Central Aetheryte Limsa
 	if backtosleep.runningcentrallimsa then
 		if math.distance3d(Player.pos,{x=-84.03,y=20.77,z=0.02})<=20 then
-			backtosleep.cityBigAetheryteTeleport(-84.03,20.77,0.02,8)
+			backtosleep.cityBigAetheryteTeleport(-84.03,20.77,0.02,6)
 		else
 			backtosleep.teleportTo(8)
 		end
 				
-	end	
+	end
+--MB Limsa
+	if backtosleep.runningmblimsa then
+		--map and range where it ends
+		if Player.localmapid == 129 and math.distance3d(Player.pos,{x=-224.28,y=16.00,z=46.66})<=4 then
+			if not Player:IsMoving() then
+				backtosleep.stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		--if not on map tp to it
+		elseif not (Player.localmapid == 129) then
+			backtosleep.teleportTo(8)
+		--if on map but not objective...
+		elseif (Player.localmapid == 129) then
+			--if around aetheryte interact and aetheryte to hawkers' Alley
+			if math.distance3d(Player.pos,{x=-84.03,y=20.77,z=0.02})<=20 then
+				backtosleep.cityBigAetheryteTravel(-84.03,20.77,0.02,8,8,"Hawkers' Alley.")
+			--if somewhere midway between aetheryte Hawkers' Alley and objective 		
+			elseif math.distance3d(Player.pos,{x=-217.75,y=16.00,z=47.32})<=10 then
+				--random move to max radius < range where it ends (same pos as where it ends)
+				backtosleep.randomMoveTo(-224.28,16.00,46.66,0,3)				
+			else
+				backtosleep.teleportTo(8)
+			end
+		end		
+	end
+--Leve Kugane
+	if backtosleep.runninglevekugane then
+		--map and range where it ends
+		if Player.localmapid == 628 and math.distance3d(Player.pos,{x=21.03,y=0.00,z=-76.93})<=4 then
+			if not Player:IsMoving() then
+				backtosleep.stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		--if not on map tp to it
+		elseif not (Player.localmapid == 628) then
+			backtosleep.teleportTo(111)
+		--if on map but not objective...
+		elseif (Player.localmapid == 628) then
+			--if somewhere midway between aetheryte and objective 		
+			if math.distance3d(Player.pos,{x=34.8,y=3,z=-60.91})<=40 then
+				--random move to max radius < range where it ends (same pos as where it ends)
+				backtosleep.randomMoveTo(21.03,0.00,-76.93,0,3)				
+			else
+				backtosleep.teleportTo(111)
+			end
+		end		
+	end
+--MB Kugane
+	if backtosleep.runningmbkugane then
+		--map and range where it ends
+		if Player.localmapid == 628 and math.distance3d(Player.pos,{x=2.47,y=4.00,z=51.23})<=4 then
+			if not Player:IsMoving() then
+				backtosleep.stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		--if not on map tp to it
+		elseif not (Player.localmapid == 628) then
+			backtosleep.teleportTo(111)
+		--if on map but not objective...
+		elseif (Player.localmapid == 628) then
+			--if around aetheryte interact and aetheryte to hawkers' Alley
+			if math.distance3d(Player.pos,{x=47.5,y=8.44,z=-37.31})<=15 then
+				backtosleep.cityBigAetheryteTravel(47.5,8.44,-37.31,8,111,"Kogane Dori Markets.")
+			--if somewhere midway between aetheryte and objective 		
+			elseif math.distance3d(Player.pos,{x=12.28,y=4.00,z=60.91})<=25 then
+				--random move to max radius < range where it ends (same pos as where it ends)
+				if TimeSince(backtosleepmovenow) > 10000 then
+					backtosleep.randomMoveTo(2.47,4.00,51.23,0,3)				
+				end
+			else
+				if math.distance3d(Player.pos,{x=34.8,y=3,z=-60.91})<=40 then
+					backtosleep.cityBigAetheryteTravel(47.5,8.44,-37.31,8,111,"Kogane Dori Markets.")
+					backtosleepmovenow = Now()
+				else
+					backtosleep.teleportTo(111)
+				end
+			end
+		end		
+	end
+--Leve Crystarium
+	if backtosleep.runninglevecrystarium then
+		--map and range where it ends
+		if Player.localmapid == 819 and math.distance3d(Player.pos,{x=-72.35,y=20.00,z=-111.34})<=4 then
+			if not Player:IsMoving() then
+				backtosleep.stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		--if not on map tp to it
+		elseif not (Player.localmapid == 819) then
+			backtosleep.teleportTo(133)
+		--if on map but not objective...
+		elseif (Player.localmapid == 819) then
+			--if around aetheryte interact and aetheryte to hawkers' Alley
+			if math.distance3d(Player.pos,{x=-65.02,y=4.53,z=0.02})<=15 then
+				backtosleep.cityBigAetheryteTravel(-65.02,4.53,0.02,9,133,"The Crystalline Mean.")
+			--if somewhere midway between aetheryte and objective 		
+			elseif math.distance3d(Player.pos,{x=-61.98,y=20.00,z=-138.94})<=45 then
+				--random move to max radius < range where it ends (same pos as where it ends)
+				backtosleep.randomMoveTo(-72.35,20.00,-111.34,0,3)				
+			else
+				backtosleep.teleportTo(133)
+			end
+		end		
+	end
+
 end
 
 RegisterEventHandler("Gameloop.Update",backtosleep.OnUpdateHandler)
