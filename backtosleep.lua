@@ -1,6 +1,6 @@
 --using Kitanoi draw function / menu snippet from discord #lua-help
 --Rinn#4747
---v0.0.12
+--v0.0.13
 
 backtosleep= { }
 backtosleep.toggletable = {
@@ -16,6 +16,11 @@ backtosleep.toggletable = {
 							"mbkugane",
 							"levekugane",
 							"levecrystarium",
+							"mbgridania",
+							"mbuldah",
+							"fcgridania",
+							"fculdah",
+							"mbishgard",
 }
 
 
@@ -47,13 +52,16 @@ backtosleep.pos = {}
 backtosleep.pos.maps = {
 			["The Roost"] = 179,
 			["Old Gridania"] = 132,
+			["New Gridania"] = 133,
 			["Mizzenmast"] = 177,
 			["Limsa Lominsa Upper Deck"] = 128,
 			["Limsa Lominsa Lower Deck"] = 129,
 			["The Hourglass"] = 178,
 			["Steps of Nald"] = 130,
+			["Steps of Thal"] = 131,
 			["Cloudnine"] = 429,
 			["Foundation"] = 418,
+			["The Pillars"] = 419,
 			["Bokairo Inn"] = 629,
 			["Kugane"] = 628,
 			["The Pendants"] = 843,
@@ -61,7 +69,7 @@ backtosleep.pos.maps = {
 }
 
 backtosleep.pos.aetheryteID = {
-			["Gridania"] = {id = 2, tpradius = 4},
+			["Gridania"] = {id = 2, tpradius = 7},
 			["Limsa"] = {id = 8, tpradius = 8},
 			["Ul'dah"] = {id = 9, tpradius = 4},
 			["Ishgard"] = {id = 70, tpradius = 8},
@@ -73,12 +81,23 @@ backtosleep.pos.loc = {
 			["Limsa Aetheryte"] = {x = -84.03, y= 20.77, z= 0.02, radius = 20 },
 			["Limsa FC Chest Area"] = {x=-201.49,y=15.98,z=50.6, radius = 25},
 			["Limsa FC Chest Stop"] = {x=-199.58,y=16.00,z=57.51, radius = 8},
+			["Gridania Aetheryte"] =  { x = 32.979545593262, y = 2.2000007629395, z = 29.989479064941, radius = 11},
+			["Gridania FC Chest Area"] = { x = 118.16472625732, y = 10.615682601929, z = -99.592720031738, radius = 25},
+			["Gridania FC Chest Stop"] =  { x = 134.22993469238, y = 13.4781665802, z = -89.669204711914, radius = 4},
+			["Gridania MB Area"] =  { x = 129.64942932129, y = 11.566942214966, z = -101.5057220459, radius = 36},
+			["Gridania MB Stop"] =  { x = 160.85282897949, y = 15.5, z = -92.423233032227, radius = 3},
 			["Limsa MB Area"] = {x=-217.75,y=16.00,z=47.32, radius = 10},
 			["Limsa MB Stop"] = {x=-224.28,y=16.00,z=46.66, radius = 4},
 			["Ul'dah Aetheryte"] = {x=-144.41030883789, y = -3.1548881530762, z = -169.6149597168, radius = 10},
 			["Ul'dah Inn Area"] = {x=39.32,y=8.00,z=-98.18, radius= 40},
+			["Ul'dah FC Chest Area"] = { x = 131.24674987793, y = 4, z = -35.229454040527, radius = 9},
+			["Ul'dah FC Chest Stop"] =  { x = 129.47009277344, y = 4, z = -39.51485824585, radius = 3},
+			["Ul'dah MB Area"] =  { x = 137.97302246094, y = 4.0495562553406, z = -33.074047088623, radius = 12},
+			["Ul'dah MB Stop"] =  { x = 146.75076293945, y = 4, z = -34.977733612061, radius = 3},
 			["Ishgard Aetheryte"] = {x=-63.98,y=11.15,z=43.99, radius = 15},
 			["Ishgard Inn Area"] = {x=66.40,y=23.98,z=18.08, radius = 40},
+			["Ishgard MB Area"] = { x = -144.51309204102, y = -12.534912109375, z = -28.21305847168, radius = 20},
+			["Ishgard MB Stop"] = { x = -154.26528930664, y = -12.534914970398, z = -38.316753387451, radius = 3},
 			["Kugane Aetheryte"] = {x=47.5,y=8.44,z=-37.31, radius = 15},
 			["Kugane Inn Area"] = {x=-84.73,y=18.05,z=-181.11, radius = 25},
 			["Kugane Leves Area"] = {x=34.8,y=3,z=-60.91, radius = 40},
@@ -91,6 +110,16 @@ backtosleep.pos.loc = {
 			["Crystarium Leves Stop"] = {x=-72.35,y=20.00,z=-111.34, radius = 4},
 
 }
+
+backtosleep.pos.innkeeper = {
+			["Gridania"] = {x=25.56 , y=-8 , z=97.94 , contentID =1000102 },
+			["Limsa"] = {x=12.83 , y=40 , z=11.66 , contentID =1000974 },
+			["Ul'dah"] = {x=29.06 , y=7.00 , z=-80.31 , contentID =1001976 },
+			["Ishgard"] = {x=84.83 , y=15.09 , z=33.61 , contentID =1011193 },
+			["Kugane"] = {x=-85.85 , y=19.00 , z=-198.99 , contentID =1018981 },
+			["Crystarium"] = {x=62.71 , y=1.72 , z=247.85 , contentID =1027231 },
+}
+
 
 local function iAmOnMap(string)
 	if Player.localmapid == backtosleep.pos.maps[string] then
@@ -194,6 +223,10 @@ function backtosleep.Draw( event, ticks )
 				GUI:NewLine()
 					guitogglebutton("roost","Gridania")
 				GUI:SameLine()
+					guitogglebutton("mbgridania","Marketboard")
+				GUI:SameLine()
+					guitogglebutton("fcgridania","FC Chest")
+				GUI:SameLine()
 				GUI:NewLine()
 					guitogglebutton("mizzen","Limsa")
 				GUI:SameLine()
@@ -206,8 +239,14 @@ function backtosleep.Draw( event, ticks )
 				GUI:NewLine()
 					guitogglebutton("hourglass","Ul'dah")
 				GUI:SameLine()
+					guitogglebutton("mbuldah","Marketboard")
+				GUI:SameLine()
+					guitogglebutton("fculdah","FC Chest")
+				GUI:SameLine()
 				GUI:NewLine()
 					guitogglebutton("cloudnine","Ishgard")
+				GUI:SameLine()
+					guitogglebutton("mbishgard","MarketBoard")
 				GUI:SameLine()
 				GUI:NewLine()
 					guitogglebutton("bokairoinn","Kugane")
@@ -316,7 +355,10 @@ local function canMoveTo(posx,posy,posz)
 	end
 end
 
-local function randomMoveTo(posx,posy,posz,min,max)
+local function randomMoveTo(location,min,max)
+	local posx = backtosleep.pos.loc[location].x
+	local posy = backtosleep.pos.loc[location].y
+	local posz = backtosleep.pos.loc[location].z
 	if not (backtosleepmapid == Player.localmapid) then
 		backtosleeprandompoint = nil
 		backtosleepmapid = Player.localmapid
@@ -334,13 +376,30 @@ local function randomMoveTo(posx,posy,posz,min,max)
 end
 
 
+-- local function cityBigAetheryteTravel(posx,posy,posz,deviation,aetheryteContentID,querystring)
+	-- if not (math.distance3d(Player.pos,{x= posx,y= posy, z= posz})<= deviation) then
+		-- canMoveTo(posx,posy,posz)
+	-- else
+		-- stopIfMoving()
+		-- bigAetheryteInteract(aetheryteContentID,querystring)
+	-- end
 
-local function cityBigAetheryteTravel(posx,posy,posz,deviation,aetheryteContentID,querystring)
+-- end
+
+
+local function cityBigAetheryteTravel(aetherytelocation,aetheryteid,aethernetquery)
+--posx,posy,posz,deviation,aetheryteContentID,querystring
+local posx = backtosleep.pos.loc[aetherytelocation].x
+local posy = backtosleep.pos.loc[aetherytelocation].y
+local posz = backtosleep.pos.loc[aetherytelocation].z
+local deviation = backtosleep.pos.aetheryteID[aetheryteid].tpradius
+local aetheryteContentID = backtosleep.pos.aetheryteID[aetheryteid].id
+
 	if not (math.distance3d(Player.pos,{x= posx,y= posy, z= posz})<= deviation) then
 		canMoveTo(posx,posy,posz)
 	else
 		stopIfMoving()
-		bigAetheryteInteract(aetheryteContentID,querystring)
+		bigAetheryteInteract(aetheryteContentID,aethernetquery)
 	end
 
 end
@@ -356,11 +415,15 @@ local function cityBigAetheryteTeleport(posx,posy,posz,deviation)
 end
 
 
-function innGuyTravel(posx,posy,posz,contentID)
+function innGuyTravel(string)
+	local posx = backtosleep.pos.innkeeper[string].x
+	local posy = backtosleep.pos.innkeeper[string].y
+	local posz = backtosleep.pos.innkeeper[string].z
+	local content = backtosleep.pos.innkeeper[string].contentID
 	if not (math.distance3d(Player.pos,{x=posx,y=posy,z=posz})<=1) then
 		canMoveTo(posx,posy,posz)
 	else
-		innGuyInteract(contentID)
+		innGuyInteract(content)
 	end
 end
 
@@ -373,7 +436,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif not iAmOnMap("Old Gridania") then
 			teleportTo("Gridania")		
 		elseif iAmOnMap("Old Gridania") then
-			innGuyTravel(25.56,-8.00,97.94,1000102)
+			innGuyTravel("Gridania")
 		end
 	end
 --MIZZENMAST	
@@ -383,9 +446,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif not iAmOnMap("Limsa Lominsa Upper Deck") and not iAmOnMap("Limsa Lominsa Lower Deck") then
 			teleportTo("Limsa")
 		elseif iAmOnMap("Limsa Lominsa Lower Deck") then
-			cityBigAetheryteTravel(-84.03,20.77,0.02,8,8,"The Aftcastle.")
+			cityBigAetheryteTravel("Limsa Aetheryte","Limsa","The Aftcastle.")
 		elseif iAmOnMap("Limsa Lominsa Upper Deck") then
-			innGuyTravel(12.83,40,11.66,1000974)
+			innGuyTravel("Limsa")
 		end		
 	end
 --HOURGLASS	
@@ -396,9 +459,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			teleportTo("Ul'dah")
 		elseif iAmOnMap("Steps of Nald") then
 			if  iAmOnLocRange("Ul'dah Aetheryte") then
-				cityBigAetheryteTravel(-144.41030883789,-3.1548881530762,-169.6149597168,4,9,"Adventurers' Guild.")
+				cityBigAetheryteTravel("Ul'dah Aetheryte","Ul'dah","Adventurers' Guild.")
 			elseif iAmOnLocRange("Ul'dah Inn Area") then
-				innGuyTravel(29.06,7.00,-80.31,1001976)				
+				innGuyTravel("Ul'dah")				
 			else
 				teleportTo("Ul'dah")
 			end
@@ -412,9 +475,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			teleportTo("Ishgard")
 		elseif iAmOnMap("Foundation") then
 			if iAmOnLocRange("Ishgard Aetheryte") then
-				cityBigAetheryteTravel(-63.98,11.15,43.99,8,70,"The Forgotten Knight.")
+				cityBigAetheryteTravel("Ishgard Aetheryte","Ishgard","The Forgotten Knight.")
 			elseif iAmOnLocRange("Ishgard Inn Area") then
-				innGuyTravel(84.83,15.09,33.61,1011193)												
+				innGuyTravel("Ishgard")												
 			else
 				teleportTo("Ishgard")
 			end
@@ -427,10 +490,10 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif not iAmOnMap("Kugane") then
 			teleportTo("Kugane")
 		elseif iAmOnMap("Kugane") then
-			if math.distance3d(Player.pos,{x=47.5,y=8.44,z=-37.31})<=15 then
-				cityBigAetheryteTravel(47.5,8.44,-37.31,8,111,"Bokairo Inn.")
-			elseif math.distance3d(Player.pos,{x=-84.73,y=18.05,z=-181.11})<=25 then
-				innGuyTravel(-85.85,19.00,-198.99,1018981)												
+			if iAmOnLocRange("Kugane Aetheryte") then
+				cityBigAetheryteTravel("Kugane Aetheryte","Kugane","Bokairo Inn.")
+			elseif iAmOnLocRange("Kugane Inn Area") then
+				innGuyTravel("Kugane")												
 			else
 				teleportTo("Kugane")
 			end
@@ -444,9 +507,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			teleportTo("Crystarium")
 		elseif iAmOnMap("Crystarium") then
 			if iAmOnLocRange("Crystarium Aetheryte") then
-				cityBigAetheryteTravel(-65.02,4.53,0.02,9,133,"The Pendants.")
+				cityBigAetheryteTravel("Crystarium Aetheryte","Crystarium","The Pendants.")
 			elseif iAmOnLocRange("Crystarium Inn Area") then
-				innGuyTravel(62.71,1.72,247.85,1027231)												
+				innGuyTravel("Crystarium")												
 			else
 				teleportTo("Crystarium")
 			end
@@ -465,9 +528,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif iAmOnMap("Limsa Lominsa Lower Deck") then
 			--if math.distance3d(Player.pos,{x=-84.03,y=20.77,z=0.02})<=20 then
 			if iAmOnLocRange("Limsa Aetheryte") then
-				cityBigAetheryteTravel(-84.03,20.77,0.02,8,8,"Hawkers' Alley.")
+				cityBigAetheryteTravel("Limsa Aetheryte","Limsa","Hawkers' Alley.")
 			elseif iAmOnLocRange("Limsa FC Chest Area") then
-				randomMoveTo(-199.58,16.00,57.51,0,6)				
+				randomMoveTo("Limsa FC Chest Stop",0,6)				
 			else
 				teleportTo("Limsa")
 			end
@@ -498,11 +561,11 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif iAmOnMap("Limsa Lominsa Lower Deck") then
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Limsa Aetheryte") then
-				cityBigAetheryteTravel(-84.03,20.77,0.02,8,8,"Hawkers' Alley.")
+				cityBigAetheryteTravel("Limsa Aetheryte","Limsa","Hawkers' Alley.")
 			--if somewhere midway between aetheryte Hawkers' Alley and objective 		
 			elseif iAmOnLocRange("Limsa MB Area") then
 				--random move to max radius < range where it ends (same pos as where it ends)
-				randomMoveTo(-224.28,16.00,46.66,0,3)				
+				randomMoveTo("Limsa MB Stop",0,3)				
 			else
 				teleportTo("Limsa")
 			end
@@ -525,7 +588,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			--if somewhere midway between aetheryte and objective 		
 			if iAmOnLocRange("Kugane Leves Area") then
 				--random move to max radius < range where it ends (same pos as where it ends)
-				randomMoveTo(21.03,0.00,-76.93,0,3)				
+				randomMoveTo("Kugane Leves Stop",0,3)				
 			else
 				teleportTo("Kugane")
 			end
@@ -547,16 +610,16 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif iAmOnMap("Kugane") then
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Kugane Aetheryte") then
-				cityBigAetheryteTravel(47.5,8.44,-37.31,8,111,"Kogane Dori Markets.")
+				cityBigAetheryteTravel("Kugane Aetheryte","Kugane","Kogane Dori Markets.")
 			--if somewhere midway between aetheryte and objective 		
 			elseif iAmOnLocRange("Kugane MB Area") then
 				--random move to max radius < range where it ends (same pos as where it ends)
 				if TimeSince(backtosleepmovenow) > 10000 then
-					randomMoveTo(2.47,4.00,51.23,0,3)				
+					randomMoveTo("Kugane MB Stop",0,3)				
 				end
 			else
 				if iAmOnLocRange("Kugane Leves Area") then
-					cityBigAetheryteTravel(47.5,8.44,-37.31,8,111,"Kogane Dori Markets.")
+					cityBigAetheryteTravel("Kugane Aetheryte","Kugane","Kogane Dori Markets.")
 					backtosleepmovenow = Now()
 				else
 					teleportTo("Kugane")
@@ -580,17 +643,146 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif iAmOnMap("Crystarium") then
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Crystarium Aetheryte") then
-				cityBigAetheryteTravel(-65.02,4.53,0.02,9,133,"The Crystalline Mean.")
+				cityBigAetheryteTravel("Crystarium Aetheryte","Crystarium","The Crystalline Mean.")
 			--if somewhere midway between aetheryte and objective 		
 			elseif iAmOnLocRange("Crystarium Leves Area") then
 				--random move to max radius < range where it ends (same pos as where it ends)
-				randomMoveTo(-72.35,20.00,-111.34,0,3)				
+				randomMoveTo("Crystarium Leves Stop",0,3)				
 			else
 				teleportTo("Crystarium")
 			end
 		end		
 	end
-
+--MB Gridania
+	if backtosleep.runningmbgridania then
+		--map and range where it ends
+		if iAmOnMap("New Gridania") and iAmOnLocRange("Gridania MB Stop") then
+			if not Player:IsMoving() then
+				stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		--if not on map tp to it
+		elseif not iAmOnMap("Old Gridania") and not iAmOnMap("New Gridania")  then
+			teleportTo("Gridania")
+		--if on map but not objective...
+		elseif iAmOnMap("Old Gridania") then
+			--if around aetheryte interact and aetheryte to hawkers' Alley
+			if iAmOnLocRange("Gridania Aetheryte") then
+				cityBigAetheryteTravel("Gridania Aetheryte","Gridania","Leatherworkers' Guild.") 						
+			else
+				teleportTo("Gridania")
+			end
+		elseif iAmOnMap("New Gridania") and iAmOnLocRange("Gridania MB Area") then
+			randomMoveTo("Gridania MB Stop",0,2)
+		else
+			teleportTo("Gridania")
+		end		
+	end
+--MB Ul'dah	
+	if backtosleep.runningmbuldah then
+		--map and range where it ends
+		if iAmOnMap("Steps of Thal") and iAmOnLocRange("Ul'dah MB Stop") then
+			if not Player:IsMoving() then
+				stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		--if not on map tp to it
+		elseif not iAmOnMap("Steps of Thal") and not iAmOnMap("Steps of Nald")  then
+			teleportTo("Ul'dah")
+		--if on map but not objective...
+		elseif iAmOnMap("Steps of Nald") then
+			--if around aetheryte interact and aetheryte to hawkers' Alley
+			if iAmOnLocRange("Ul'dah Aetheryte") then
+				cityBigAetheryteTravel("Ul'dah Aetheryte","Ul'dah","Sapphire Avenue Exchange.") 						
+			else
+				teleportTo("Ul'dah")
+			end
+		elseif iAmOnMap("Steps of Thal") and iAmOnLocRange("Ul'dah MB Area") then
+			randomMoveTo("Ul'dah MB Stop",0,2)
+		else
+			teleportTo("Ul'dah")
+		end		
+	end
+--FC Ul'dah	
+	if backtosleep.runningfculdah then
+		--map and range where it ends
+		if iAmOnMap("Steps of Thal") and iAmOnLocRange("Ul'dah FC Chest Stop") then
+			if not Player:IsMoving() then
+				stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		--if not on map tp to it
+		elseif not iAmOnMap("Steps of Thal") and not iAmOnMap("Steps of Nald")  then
+			teleportTo("Ul'dah")
+		--if on map but not objective...
+		elseif iAmOnMap("Steps of Nald") then
+			--if around aetheryte interact and aetheryte to hawkers' Alley
+			if iAmOnLocRange("Ul'dah Aetheryte") then
+				cityBigAetheryteTravel("Ul'dah Aetheryte","Ul'dah","Sapphire Avenue Exchange.") 						
+			else
+				teleportTo("Ul'dah")
+			end
+		elseif iAmOnMap("Steps of Thal") and iAmOnLocRange("Ul'dah FC Chest Area") then
+			randomMoveTo("Ul'dah FC Chest Stop",0,2)
+		else
+			teleportTo("Ul'dah")
+		end		
+	end
+--FC Gridania
+	if backtosleep.runningfcgridania then
+		--map and range where it ends
+		if iAmOnMap("New Gridania") and iAmOnLocRange("Gridania FC Chest Stop") then
+			if not Player:IsMoving() then
+				stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		--if not on map tp to it
+		elseif not iAmOnMap("Old Gridania") and not iAmOnMap("New Gridania")  then
+			teleportTo("Gridania")
+		--if on map but not objective...
+		elseif iAmOnMap("Old Gridania") then
+			--if around aetheryte interact and aetheryte to hawkers' Alley
+			if iAmOnLocRange("Gridania Aetheryte") then
+				cityBigAetheryteTravel("Gridania Aetheryte","Gridania","Leatherworkers' Guild.") 						
+			else
+				teleportTo("Gridania")
+			end
+		elseif iAmOnMap("New Gridania") and iAmOnLocRange("Gridania FC Chest Area") then
+			randomMoveTo("Gridania FC Chest Stop",0,2)
+		else
+			teleportTo("Gridania")
+		end		
+	end
+--MB Ishgard
+	if backtosleep.runningmbishgard then
+		--map and range where it ends
+		if iAmOnMap("The Pillars") and iAmOnLocRange("Ishgard MB Stop") then
+			if not Player:IsMoving() then
+				stopRunning()
+				backtosleeprandompoint = nil
+				d("stop running")
+			end
+		--if not on map tp to it
+		elseif not iAmOnMap("Foundation") and not iAmOnMap("The Pillars")  then
+			teleportTo("Ishgard")
+		--if on map but not objective...
+		elseif iAmOnMap("Foundation") then
+			--if around aetheryte interact and aetheryte to hawkers' Alley
+			if iAmOnLocRange("Ishgard Aetheryte") then
+				cityBigAetheryteTravel("Ishgard Aetheryte","Ishgard","The Jeweled Crozier.") 						
+			else
+				teleportTo("Ishgard")
+			end
+		elseif iAmOnMap("The Pillars") and iAmOnLocRange("Ishgard MB Area") then
+			randomMoveTo("Ishgard MB Stop",0,2)
+		else
+			teleportTo("Ishgard")
+		end		
+	end	
 end
 
 RegisterEventHandler("Gameloop.Update",backtosleep.OnUpdateHandler)
