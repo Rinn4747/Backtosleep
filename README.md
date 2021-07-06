@@ -13,3 +13,4 @@ TODO / might do:  <br />
 ~~-refacto ?~~ some more refacto i guess / comments <br />
 -add failsafe (if missing aethernet or quest advancement (enquire within) ) <br />
 -aethernet id list in order to tp to target if aethernet id close rather than teleport <br />
+-debug with argus draw
