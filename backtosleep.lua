@@ -1,20 +1,29 @@
 --using Kitanoi draw function / menu snippet from discord #lua-help
 --Rinn#4747
---v0.0.9
+--v0.0.10
 
 backtosleep= { }
-backtosleep.runningroost = false
-backtosleep.runningmizzen = false
-backtosleep.runninghourglass = false
-backtosleep.runningcloudnine = false
-backtosleep.runningbokairoinn = false
-backtosleep.runningthependants = false
-backtosleep.runningfclimsa = false
-backtosleep.runningcentrallimsa = false
-backtosleep.runningmblimsa = false
-backtosleep.runningmbkugane = false
-backtosleep.runninglevekugane = false
-backtosleep.runninglevecrystarium = false
+
+backtosleep.toggletable = {
+							"roost",
+							"mizzen",
+							"hourglass",
+							"cloudnine",
+							"bokairoinn",
+							"thependants",
+							"fclimsa",
+							"centrallimsa",
+							"mblimsa",
+							"mbkugane",
+							"levekugane",
+							"levecrystarium",
+}
+
+
+for _,toggle in pairs(backtosleep.toggletable) do
+	backtosleep["running"..toggle] = false
+end
+
 backtosleep.running = false
 backtosleep.lastticks = 0
 backtosleep.GUI = {}
@@ -38,23 +47,14 @@ end
 
 
 function backtosleep.stopRunning()
-	backtosleep.runningroost = false
-	backtosleep.runningmizzen = false
-	backtosleep.runninghourglass = false
-	backtosleep.runningcloudnine = false
-	backtosleep.runningbokairoinn = false
-	backtosleep.runningthependants = false
-	backtosleep.runningfclimsa = false
-	backtosleep.runningcentrallimsa = false
-	backtosleep.runningmblimsa = false
-	backtosleep.runningmbkugane = false
-	backtosleep.runninglevekugane = false
-	backtosleep.runninglevecrystarium = false
+	for _,toggle in pairs(backtosleep.toggletable) do
+		backtosleep["running"..toggle] = false
+	end
 	backtosleep.running = false
 	backtosleep.stopIfMoving()
 end
 
-
+-----------------------Toggle Function
 function backtosleep.ToggleRun(string)
 	if backtosleep["running"..string] then
 		backtosleep.stopRunning()
@@ -64,55 +64,7 @@ function backtosleep.ToggleRun(string)
 		backtosleep.running = true
 	end
 end
-
---Toggle Function 
-function backtosleep.ToggleRunRoost()
-	backtosleep.ToggleRun("roost")
-end
-
-function backtosleep.ToggleRunMizzen()
-	backtosleep.ToggleRun("mizzen")
-end
-
-function backtosleep.ToggleRunHourglass()
-	backtosleep.ToggleRun("hourglass")
-end
-
-function backtosleep.ToggleRunCloudNine()
-	backtosleep.ToggleRun("cloudnine")
-end
-
-function backtosleep.ToggleRunBokairoInn()
-	backtosleep.ToggleRun("bokairoinn")
-end
-
-function backtosleep.ToggleRunThePendants()
-	backtosleep.ToggleRun("thependants")
-end
-
-function backtosleep.ToggleRunfclimsa()
-	backtosleep.ToggleRun("fclimsa")
-end
-
-function backtosleep.ToggleRuncentrallimsa()
-	backtosleep.ToggleRun("centrallimsa")
-end
-
-function backtosleep.ToggleRunmblimsa()
-	backtosleep.ToggleRun("mblimsa")
-end
-
-function backtosleep.ToggleRunmbkugane()
-	backtosleep.ToggleRun("mbkugane")
-end
-
-function backtosleep.ToggleRunlevekugane()
-	backtosleep.ToggleRun("levekugane")
-end
-
-function backtosleep.ToggleRunlevecrystarium()
-	backtosleep.ToggleRun("levecrystarium")
-end
+---------------------------------------
 
 
 
@@ -151,81 +103,53 @@ function backtosleep.Draw( event, ticks )
 				GUI:InputTextEditor([[##State]], "Currently running : "..tostring(backtosleep.running),400,50,(GUI.InputTextFlags_ReadOnly))
 				GUI:SameLine()
 				GUI:NewLine()
-				local toggleroostsleep = GUI:Button("Gridania",100,20)
-                if GUI:IsItemClicked(toggleroostsleep) then 
-					backtosleep.ToggleRunRoost()
-                end
+					backtosleep.guitogglebutton("roost","Gridania")
 				GUI:SameLine()
 				GUI:NewLine()
-				local togglemizzensleep = GUI:Button("Limsa",100,20)
-                if GUI:IsItemClicked(togglemizzensleep) then 
-					backtosleep.ToggleRunMizzen()
-                end
+					backtosleep.guitogglebutton("mizzen","Limsa")
 				GUI:SameLine()
-				local togglefclimsasleep = GUI:Button("FC Chest",100,20)
-                if GUI:IsItemClicked(togglefclimsasleep) then 
-					backtosleep.ToggleRunfclimsa()
-                end
+					backtosleep.guitogglebutton("fclimsa","FC Chest")
 				GUI:SameLine()
-				local togglecentrallimsasleep = GUI:Button("WorldHop",100,20)
-                if GUI:IsItemClicked(togglecentrallimsasleep) then 
-					backtosleep.ToggleRuncentrallimsa()
-                end
+					backtosleep.guitogglebutton("centrallimsa","WorldHop")
 				GUI:SameLine()
-				local togglemblimsasleep = GUI:Button("Marketboard",100,20)
-                if GUI:IsItemClicked(togglemblimsasleep) then 
-					backtosleep.ToggleRunmblimsa()
-                end					
+					backtosleep.guitogglebutton("mblimsa","MarketBoard")
 				GUI:SameLine()				
 				GUI:NewLine()
-				local togglehourglasssleep = GUI:Button("Ul'dah",100,20)
-                if GUI:IsItemClicked(togglehourglasssleep) then 
-					backtosleep.ToggleRunHourglass()
-                end
+					backtosleep.guitogglebutton("hourglass","Ul'dah")
 				GUI:SameLine()
 				GUI:NewLine()
-				local togglecloudninesleep = GUI:Button("Ishgard",100,20)
-                if GUI:IsItemClicked(togglecloudninesleep) then 
-					backtosleep.ToggleRunCloudNine()
-                end
+					backtosleep.guitogglebutton("cloudnine","Ishgard")
 				GUI:SameLine()
 				GUI:NewLine()
-				local togglebokairoinn = GUI:Button("Kugane",100,20)
-                if GUI:IsItemClicked(togglebokairoinn) then 
-					backtosleep.ToggleRunBokairoInn()
-                end
+					backtosleep.guitogglebutton("bokairoinn","Kugane")
 				GUI:SameLine()
-				local togglelevekugane = GUI:Button("Leves",100,20)
-                if GUI:IsItemClicked(togglelevekugane) then 
-					backtosleep.ToggleRunlevekugane()
-                end
+					backtosleep.guitogglebutton("levekugane","Leves")
 				GUI:SameLine()
-				local togglembkugane = GUI:Button("Marketboard",100,20)
-                if GUI:IsItemClicked(togglembkugane) then 
-					backtosleep.ToggleRunmbkugane()
-                end
+					backtosleep.guitogglebutton("mbkugane","Marketboard")
 				GUI:SameLine()
 				GUI:NewLine()
-				local togglethependants = GUI:Button("Crystarium",100,20)
-                if GUI:IsItemClicked(togglethependants) then 
-					backtosleep.ToggleRunThePendants()
-                end
+					backtosleep.guitogglebutton("thependants","Crystarium")
 				GUI:SameLine()
-				local togglelevecrystarium = GUI:Button("Leves",100,20)
-                if GUI:IsItemClicked(togglelevecrystarium) then 
-					backtosleep.ToggleRunlevecrystarium()
-                end
+					backtosleep.guitogglebutton("levecrystarium","Leves")				
 				GUI:NewLine()
-				local stoprunning = GUI:Button("Stop",400,50)
-                if GUI:IsItemClicked(stoprunning) then 
-					backtosleep.stopRunning()
-                end
+					local stoprunning = GUI:Button("Stop",400,50)
+					if GUI:IsItemClicked(stoprunning) then 
+						backtosleep.stopRunning()
+					end
+				
             end
             GUI:End()
         end
     end
 end
 
+
+function backtosleep.guitogglebutton(strbuttonfunction,strbuttoncaption)
+	local buttonfunction = GUI:Button(strbuttoncaption,100,20)
+	if GUI:IsItemClicked(buttonfunction) then 
+		backtosleep.ToggleRun(strbuttonfunction)
+	end
+end
 
 function backtosleep.teleportTo(aetheryteID)
 	if TimeSince(backtosleepteleportnow) > 6000 then
@@ -391,8 +315,10 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif not (Player.localmapid == 130) then
 			backtosleep.teleportTo(9)
 		elseif (Player.localmapid == 130) then
-			if math.distance3d(Player.pos,{x=-147.05,y=-3.15,z=-165.64})<=10 then
-				backtosleep.cityBigAetheryteTravel(-147.05,-3.15,-165.64,3,9,"Adventurers' Guild.")
+			--if math.distance3d(Player.pos,{x=-147.05,y=-3.15,z=-165.64})<=10 then
+				--backtosleep.cityBigAetheryteTravel(-147.05,-3.15,-165.64,3,9,"Adventurers' Guild.")
+			if  math.distance3d(Player.pos,{x=-144.41030883789, y = -3.1548881530762, z = -169.6149597168}) <= 10 then
+				backtosleep.cityBigAetheryteTravel(-144.41030883789,-3.1548881530762,-169.6149597168,4,9,"Adventurers' Guild.")
 			elseif math.distance3d(Player.pos,{x=39.32,y=8.00,z=-98.18})<=40 then
 				backtosleep.innGuyTravel(29.06,7.00,-80.31,1001976)				
 			else
