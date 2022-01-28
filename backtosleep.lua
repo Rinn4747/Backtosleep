@@ -141,7 +141,12 @@ backtosleep.pos.innkeeper = {
 			["Immortal"] = {x=-152.2 , y=4.11 , z=-97.38 , contentID =2007529 },
 }
 
+
+
+
 backtosleep.serveridtoname = {
+			[21] = "Ravana",
+			[22] = "Bismarck",
 			[23] = "Asura",
 			[24] = "Belias",
 			[28] = "Pandaemonium",
@@ -200,6 +205,9 @@ backtosleep.serveridtoname = {
 			[82] = "Mandragora",
 			[83] = "Louisoix",
 			[85] = "Spriggan",
+			[86] = "Sephirot",
+			[87] = "Sophia",
+			[88] = "Zurvan",
 			[90] = "Aegis",
 			[91] = "Balmung",
 			[92] = "Durandal",
@@ -211,6 +219,10 @@ backtosleep.serveridtoname = {
 			[98] = "Ridill",
 			[99] = "Sargatanas",
 }
+
+
+
+
 backtosleep.servernametoid = {
 			["Adamantoise"] = 73,
 			["Aegis"] = 90,
@@ -222,6 +234,7 @@ backtosleep.servernametoid = {
 			["Balmung"] = 91,
 			["Behemoth"] = 78,
 			["Belias"] = 24,
+			["Bismarck"] = 22,
 			["Brynhildr"] = 34,
 			["Cactuar"] = 79,
 			["Carbuncle"] = 45,
@@ -261,11 +274,14 @@ backtosleep.servernametoid = {
 			["Phoenix"] = 56,
 			["Ragnarok"] = 97,
 			["Ramuh"] = 60,
+			["Ravana"] = 21,
 			["Ridill"] = 98,
 			["Sargatanas"] = 99,
+			["Sephirot"] = 86,
 			["Shinryu"] = 29,
 			["Shiva"] = 67,
 			["Siren"] = 57,
+			["Sophia"] = 87,
 			["Spriggan"] = 85,
 			["Tiamat"] = 76,
 			["Titan"] = 61,
@@ -280,9 +296,14 @@ backtosleep.servernametoid = {
 			["Zalera"] = 41,
 			["Zeromus"] = 32,
 			["Zodiark"] = 42,
+			["Zurvan"] = 88,
 }
 
+
+
 backtosleep.servertoregionid = {
+			[21] = 9,
+			[22] = 9,
 			[23] = 3,
 			[24] = 3,
 			[28] = 3,
@@ -341,6 +362,9 @@ backtosleep.servertoregionid = {
 			[82] = 3,
 			[83] = 6,
 			[85] = 6,
+			[86] = 9,
+			[87] = 9,
+			[88] = 9,
 			[90] = 1,
 			[91] = 8,
 			[92] = 2,
@@ -352,6 +376,7 @@ backtosleep.servertoregionid = {
 			[98] = 2,
 			[99] = 4,
 }
+
 
 
 backtosleep.server = {
@@ -439,7 +464,16 @@ backtosleep.server = {
 				37,
 				41,	
 			},
+			[9] = { --OC
+				22,
+				21,
+				86,
+				87,
+				88,
+			},			
 }
+
+
 
 function backtosleep.countIndex(worldstring)
 	local count = 0
@@ -1567,7 +1601,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		end
 	end
 --WORLDHOP
-	if currentProcess(backtosleep.currentservertravel) then
+	if not (backtosleep.currentservertravel == "") and currentProcess(backtosleep.currentservertravel) then
 		if Player.currentworld == backtosleep.servernametoid[backtosleep.currentservertravel] then
 			stopRunning()
 			backtosleep["running"..tostring(backtosleep.currentservertravel)] = false
