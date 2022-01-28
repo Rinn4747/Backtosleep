@@ -1552,7 +1552,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif not iAmOnMap("Limsa Lominsa Upper Deck") and not iAmOnMap("Limsa Lominsa Lower Deck") then
 			teleportTo("Limsa")
 		elseif iAmOnMap("Limsa Lominsa Lower Deck") then
-			cityBigAetheryteTravel("Limsa Aetheryte","Limsa","The Aftcastle.")
+			cityBigAetheryteTravel("Limsa Aetheryte","Limsa","The Aftcastle")
 		elseif iAmOnMap("Limsa Lominsa Upper Deck") then
 			barracksDoorTravel("Maelstrom")
 		end		
