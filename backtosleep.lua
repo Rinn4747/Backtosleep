@@ -26,8 +26,7 @@ backtosleep.toggletable = {
 							"exarchiceulmore",
 							"twinaddersbarracks",
 							"maelstrombarracks",
-							"immortalbarracks",
-							"hoptobooster",							
+							"immortalbarracks",						
 }
 
 local function currentProcess(string)
@@ -563,7 +562,7 @@ end
 
 
 function backtosleep.Draw( event, ticks )
-	local regionid = backtosleep.servertoregionid[Player.homeworld]
+	local regionid = backtosleep.servertoregionid[Player.currentworld]
     local gamestate = GetGameState()
     if ( gamestate == FFXIV.GAMESTATE.INGAME ) then
         if ( backtosleep.GUI.open ) then
@@ -643,13 +642,13 @@ function backtosleep.Draw( event, ticks )
 									GUI:SameLine()
 									GUI:NewLine()
 								end							
-								local buttonfunction = GUI:Button(tostring(backtosleep.serveridtoname[e]),100,20)
-								if GUI:IsItemClicked(buttonfunction) then 
-									backtosleep.currentservertravel = tostring(backtosleep.serveridtoname[e])
-									ToggleRun(tostring(backtosleep.serveridtoname[e]))
+								local buttonserverfunction = GUI:Button(tostring(backtosleep.serveridtoname[e]),100,20)
+								if GUI:IsItemClicked(buttonserverfunction) then 
+									backtosleep.currentservertravel = backtosleep.serveridtoname[e]
+									ToggleRun(backtosleep.serveridtoname[e])
 								end
 								GUI:SameLine()
-								counter = counter  + 1 
+								counter = counter  +  1 
 							end
 						end
 					end					
@@ -1571,7 +1570,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 	if currentProcess(backtosleep.currentservertravel) then
 		if Player.currentworld == backtosleep.servernametoid[backtosleep.currentservertravel] then
 			stopRunning()
-			backtosleep["running"..string] = false
+			backtosleep["running"..tostring(backtosleep.currentservertravel)] = false
 		else
 			backtosleep.exportWorldTravelRefactored(backtosleep.currentservertravel,"Gridania Aetheryte","Gridania")
 		end
