@@ -1,32 +1,37 @@
 --using Kitanoi draw function / menu snippet from discord #lua-help
 --Rinn#4747
 --with help from HereToPlay#4566 to update to the new teleport control
---v0.0.14
+--v0.0.15 --include some loc and refactored code from HereToPlay#4566
 
 backtosleep= { }
 backtosleep.toggletable = {
-							"roost",
-							"mizzen",
-							"hourglass",
-							"cloudnine",
-							"bokairoinn",
-							"thependants",
-							"fclimsa",
-							"centrallimsa",
-							"mblimsa",
-							"mbkugane",
-							"levekugane",
-							"levecrystarium",
-							"mbgridania",
-							"mbuldah",
-							"fcgridania",
-							"fculdah",
-							"mbishgard",
-							"vendoreulmore",
-							"exarchiceulmore",
-							"twinaddersbarracks",
-							"maelstrombarracks",
-							"immortalbarracks",						
+			"roost",
+			"mizzen",
+			"hourglass",
+			"cloudnine",
+			"bokairoinn",
+			"thependants",
+			"fclimsa",
+			"centrallimsa",
+			"mblimsa",
+			"mbkugane",
+			"levekugane",
+			"levecrystarium",
+			"mbgridania",
+			"mbuldah",
+			"fcgridania",
+			"fculdah",
+			"mbishgard",
+			"radzathan",
+			"collectableradzathan",
+			"oldsharlayaninn",
+			"oldsharlayanleve",
+			"thefirmamentcollector",
+			"vendoreulmore",
+			"exarchiceulmore",
+			"twinaddersbarracks",
+			"maelstrombarracks",
+			"immortalbarracks",
 }
 
 local function currentProcess(string)
@@ -55,9 +60,6 @@ local backtosleepmovenow = backtosleep.move
 local backtosleepmapid = backtosleep.mapid
 local backtosleeprandompoint = backtosleep.randompoint
 
-
-
-
 backtosleep.pos = {}
 backtosleep.pos.maps = {
 			["The Roost"] = 179,
@@ -76,8 +78,12 @@ backtosleep.pos.maps = {
 			["Kugane"] = 628,
 			["The Pendants"] = 843,
 			["Crystarium"] = 819,
+			["Old Sharlayan"] = 962,
+			["Andron"] = 990,
+			["Radz-at-Han"] = 963,
+			["The Firmament"] = 886,
 			["Eulmore"] = 820,
-			["TwinAdders Barracks"] = 534, 
+			["TwinAdders Barracks"] = 534,
 			["Maelstrom Barracks"] = 536,
 			["Immortal Barracks"] = 535,
 }
@@ -89,6 +95,8 @@ backtosleep.pos.aetheryteID = {
 			["Ishgard"] = {id = 70, tpradius = 8},
 			["Kugane"] = {id = 111, tpradius = 8},
 			["Crystarium"] = {id = 133, tpradius = 9},
+			["Old Sharlayan"] = {id = 182, tpradius = 9},
+			["Radz-at-Han"]= {id = 183, tpradius = 9},
 			["Eulmore"] = {id = 134, tpradius = 10},
 }
 
@@ -123,6 +131,13 @@ backtosleep.pos.loc = {
 			["Crystarium Inn Area"] = {x=52.74,y=1.71,z=232.94, radius = 25},
 			["Crystarium Leves Area"] = {x=-61.98,y=20.00,z=-138.94, radius = 45},
 			["Crystarium Leves Stop"] = {x=-72.35,y=20.00,z=-111.34, radius = 4},
+			["Old Sharlayan Aetheryte"] = {x=0.08,y=4.81,z=-0.11, radius = 7},
+			["Old Sharlayan Inn Area"] = {x=-96.75,y=3.90,z=12.72, radius = 40},
+			["Old Sharlayan Leve Area"] = {x=46.83,y=-15.65,z=107.87, radius = 5},
+			["Radz-at-Han Stop"] = {x=15.89,y=0,z=-37, radius = 4},
+			["Radz-at-Han Collectable Stop"] = {x=25.53,y=0.92,z=-69.08, radius = 1},
+			["The Firmament Collectable Zone"] = {x=9.31,y=-15.20,z=175.64, radius = 100},
+			["The Firmament Collectable Stop"] = {x=49.08,y=-16.00,z=168.55, radius = 5},
 			["Eulmore Aetheryte"] = {x=0.259,y=82.313,z=0.060, radius = 14},
 			["Eulmore Vendor Stop"] = {x=-46.817,y=84.195,z=30.547, radius = 3},
 			["Eulmore Exarchic Stop"] = {x=-16.350,y=82.273, z=-22.697, radius = 3 },
@@ -136,13 +151,12 @@ backtosleep.pos.innkeeper = {
 			["Ishgard"] = {x=84.83 , y=15.09 , z=33.61 , contentID =1011193 },
 			["Kugane"] = {x=-85.85 , y=19.00 , z=-198.99 , contentID =1018981 },
 			["Crystarium"] = {x=62.71 , y=1.72 , z=247.85 , contentID =1027231 },
+			["Old Sharlayan"] = {x=-101.79 , y=3.93 , z=0.64 , contentID =1037293 },
+			--["Old Sharlayan"] = {x=-100.16, y=3.93, z = 2.62, contentID =1037293}, alternate pos (in front of the desk)
 			["Maelstrom"] = {x=97.47 , y=40.25 , z=62.84 , contentID =2007527 },
 			["TwinAdders"] = {x=-79.63 , y=-0.5 , z=-6.18 , contentID =2006962},
 			["Immortal"] = {x=-152.2 , y=4.11 , z=-97.38 , contentID =2007529 },
 }
-
-
-
 
 backtosleep.serveridtoname = {
 			[21] = "Ravana",
@@ -220,9 +234,6 @@ backtosleep.serveridtoname = {
 			[99] = "Sargatanas",
 }
 
-
-
-
 backtosleep.servernametoid = {
 			["Adamantoise"] = 73,
 			["Aegis"] = 90,
@@ -298,8 +309,6 @@ backtosleep.servernametoid = {
 			["Zodiark"] = 42,
 			["Zurvan"] = 88,
 }
-
-
 
 backtosleep.servertoregionid = {
 			[21] = 9,
@@ -377,8 +386,6 @@ backtosleep.servertoregionid = {
 			[99] = 4,
 }
 
-
-
 backtosleep.server = {
 			[1] = {
 				90,
@@ -436,7 +443,7 @@ backtosleep.server = {
 				95,
 				55,
 				64,
-				77,	
+				77,
 			},
 			[6] = {
 				80,
@@ -444,7 +451,7 @@ backtosleep.server = {
 				71,
 				39,
 				97,
-				85,	
+				85,
 			},
 			[7] = {
 				36,
@@ -452,7 +459,7 @@ backtosleep.server = {
 				56,
 				67,
 				33,
-				42,	
+				42,
 			},
 			[8] = {
 				91,
@@ -462,7 +469,7 @@ backtosleep.server = {
 				81,
 				75,
 				37,
-				41,	
+				41,
 			},
 			[9] = { --OC
 				22,
@@ -470,16 +477,11 @@ backtosleep.server = {
 				86,
 				87,
 				88,
-			},			
+			},
 }
-
-
 
 function backtosleep.countIndex(worldstring)
 	local count = 0
-	
-	--local currentservername = GetControl("_DTR"):GetStrings()[4]
-	--local matchedcurrentserverid = backtosleep.servernametoid[currentservername]
 	local matchedcurrentserverid = Player.currentworld
 	local regionid = backtosleep.servertoregionid[Player.homeworld]
 	local worldid = backtosleep.servernametoid[worldstring]
@@ -510,18 +512,19 @@ local function iAmOnMap(string)
 	end
 end
 
-local function iAmOnLocRange(string)
+local function iAmOnLocRange(string,lr)
 	local lx = backtosleep.pos.loc[string].x
 	local ly = backtosleep.pos.loc[string].y
 	local lz = backtosleep.pos.loc[string].z
-	local lr = backtosleep.pos.loc[string].radius
-
+	if lr == nil then
+		lr = backtosleep.pos.loc[string].radius
+	end
 	if math.distance3d(Player.pos,{x= lx,y= ly ,z= lz}) <= lr then
 		return true
 	else
 		return false
 	end
-	
+
 end
 
 
@@ -544,7 +547,6 @@ local function stopRunning()
 	stopIfMoving()
 end
 
------------------------Toggle Function
 local function ToggleRun(string)
 	if backtosleep["running"..string] then
 		stopRunning()
@@ -554,57 +556,49 @@ local function ToggleRun(string)
 		backtosleep.running = true
 	end
 end
----------------------------------------
-
-
-
-
-
 
 function backtosleep.CheckMenu()
-    local Status = false
-    local Menu = ml_gui.ui_mgr.menu.components
-    if table.valid(Menu) then
-        for i,e in pairs(Menu) do
-            if (e.members ~= nil) then
-                for k,v in pairs(e.members) do
-                    if (v.name ~= nil and v.name == "RinnLib") then
-                        Status = true
-                    end
-                end
-            end
-        end
-    end
-    if (not Status) then
+	local Status = false
+	local Menu = ml_gui.ui_mgr.menu.components
+	if table.valid(Menu) then
+		for i,e in pairs(Menu) do
+			if (e.members ~= nil) then
+				for k,v in pairs(e.members) do
+					if (v.name ~= nil and v.name == "RinnLib") then
+						Status = true
+					end
+				end
+			end
+		end
+	end
+	if (not Status) then
 		local menuiconpath = GetLuaModsPath().."\\Backtosleep\\Rinn.jpg"
 		local iconpath = GetLuaModsPath().."\\Backtosleep\\bts.png"
-        ml_gui.ui_mgr:AddMember({ id = "FFXIVMINION##RinnLib", name = "RinnLib", texture = menuiconpath, test = "backtosleep"},"FFXIVMINION##MENU_HEADER")
-        ml_gui.ui_mgr:AddSubMember({ id = "FFXIVMINION##backtosleep", name = "backtosleep", onClick = function() backtosleep.GUI.open = not backtosleep.GUI.open end, tooltip = "backtosleep", texture = iconpath},"FFXIVMINION##MENU_HEADER","FFXIVMINION##RinnLib")
-    elseif (Status) then
+		ml_gui.ui_mgr:AddMember({ id = "FFXIVMINION##RinnLib", name = "RinnLib", texture = menuiconpath, test = "backtosleep"},"FFXIVMINION##MENU_HEADER")
+		ml_gui.ui_mgr:AddSubMember({ id = "FFXIVMINION##backtosleep", name = "backtosleep", onClick = function() backtosleep.GUI.open = not backtosleep.GUI.open end, tooltip = "backtosleep", texture = iconpath},"FFXIVMINION##MENU_HEADER","FFXIVMINION##RinnLib")
+	elseif (Status) then
 		local iconpath = GetLuaModsPath().."\\Backtosleep\\bts.png"
-        ml_gui.ui_mgr:AddSubMember({ id = "FFXIVMINION##backtosleep", name = "backtosleep", onClick = function() backtosleep.GUI.open = not backtosleep.GUI.open end, tooltip = "backtosleep", texture = iconpath},"FFXIVMINION##MENU_HEADER","FFXIVMINION##RinnLib")
-    end
+		ml_gui.ui_mgr:AddSubMember({ id = "FFXIVMINION##backtosleep", name = "backtosleep", onClick = function() backtosleep.GUI.open = not backtosleep.GUI.open end, tooltip = "backtosleep", texture = iconpath},"FFXIVMINION##MENU_HEADER","FFXIVMINION##RinnLib")
+	end
 end
 
 local function guitogglebutton(strbuttonfunction,strbuttoncaption)
 	local buttonfunction = GUI:Button(strbuttoncaption,100,20)
-	if GUI:IsItemClicked(buttonfunction) then 
+	if GUI:IsItemClicked(buttonfunction) then
 		ToggleRun(strbuttonfunction)
 	end
 end
 
-
-
 function backtosleep.Draw( event, ticks )
 	local regionid = backtosleep.servertoregionid[Player.currentworld]
-    local gamestate = GetGameState()
-    if ( gamestate == FFXIV.GAMESTATE.INGAME ) then
-        if ( backtosleep.GUI.open ) then
-			GUI:SetNextWindowSize(440,335,GUI.SetCond_FirstUseEver) 			
-			--GUI:SetNextWindowSize(440,335) 
-            backtosleep.GUI.visible, backtosleep.GUI.open = GUI:Begin("Backtosleep", backtosleep.GUI.open)
-            if ( backtosleep.GUI.visible ) then
-                backtosleep.Enable,changed = GUI:Checkbox("Enable##Enable", backtosleep.Enable)
+	local gamestate = GetGameState()
+	if ( gamestate == FFXIV.GAMESTATE.INGAME ) then
+		if ( backtosleep.GUI.open ) then
+			GUI:SetNextWindowSize(440,335,GUI.SetCond_FirstUseEver)
+			--GUI:SetNextWindowSize(440,335)
+			backtosleep.GUI.visible, backtosleep.GUI.open = GUI:Begin("Backtosleep", backtosleep.GUI.open)
+			if ( backtosleep.GUI.visible ) then
+				backtosleep.Enable,changed = GUI:Checkbox("Enable##Enable", backtosleep.Enable)
 				GUI:InputTextEditor([[##State]], "Currently running : "..tostring(backtosleep.running),430,50,(GUI.InputTextFlags_ReadOnly))
 				GUI:SameLine()
 				GUI:NewLine()
@@ -622,7 +616,7 @@ function backtosleep.Draw( event, ticks )
 					guitogglebutton("centrallimsa","WorldHop")
 				GUI:SameLine()
 					guitogglebutton("mblimsa","MarketBoard")
-				GUI:SameLine()				
+				GUI:SameLine()
 				GUI:NewLine()
 					guitogglebutton("hourglass","Ul'dah")
 				GUI:SameLine()
@@ -635,6 +629,8 @@ function backtosleep.Draw( event, ticks )
 				GUI:SameLine()
 					guitogglebutton("mbishgard","MarketBoard")
 				GUI:SameLine()
+					guitogglebutton("thefirmamentcollector","Collector")
+				GUI:SameLine()
 				GUI:NewLine()
 					guitogglebutton("bokairoinn","Kugane")
 				GUI:SameLine()
@@ -645,7 +641,7 @@ function backtosleep.Draw( event, ticks )
 				GUI:NewLine()
 					guitogglebutton("thependants","Crystarium")
 				GUI:SameLine()
-					guitogglebutton("levecrystarium","Leves")				
+					guitogglebutton("levecrystarium","Leves")
 				GUI:SameLine()
 				GUI:NewLine()
 					guitogglebutton("vendoreulmore","Aymark")
@@ -653,88 +649,92 @@ function backtosleep.Draw( event, ticks )
 					guitogglebutton("exarchiceulmore","Hilicen")
 				GUI:SameLine()
 				GUI:NewLine()
-					local servers = {}
-					for i,e in pairs(backtosleep.server[regionid]) do 
+					guitogglebutton("oldsharlayaninn","Old Sharlayan")
+				GUI:SameLine()
+					guitogglebutton("oldsharlayanleve","Leves")
+				GUI:SameLine()
+				GUI:NewLine()
+					guitogglebutton("radzathan","Radz-at-Han")
+				GUI:SameLine()
+					guitogglebutton("collectableradzathan","Collectable")
+				local servers = {}
+				for i,e in pairs(backtosleep.server[regionid]) do
+					if not (e == Player.currentworld) then
+						servers[#servers+1] = tostring(backtosleep.serveridtoname[e])
+					end
+				end
+				for _,server in pairs(servers) do
+					if not backtosleep["running"..server] then
+						backtosleep["running"..server] = false
+					end
+					backtosleep.toggletable[#backtosleep.toggletable+1] = server
+				end
+				local counter = 0
+				if backtosleep.server[regionid] ~= nil then
+					for i,e in pairs(backtosleep.server[regionid]) do
 						if not (e == Player.currentworld) then
-							servers[#servers+1] = tostring(backtosleep.serveridtoname[e])
-						end
-					end
-					for _,server in pairs(servers) do
-						if not backtosleep["running"..server] then
-							backtosleep["running"..server] = false
-						end
-						backtosleep.toggletable[#backtosleep.toggletable+1] = server					
-					end
-					local counter = 0
-					if backtosleep.server[regionid] ~= nil then
-						for i,e in pairs(backtosleep.server[regionid]) do
-							
-
-							if not (e == Player.currentworld) then
-								if counter >= 4 then
-									counter = 0
-									GUI:SameLine()
-									GUI:NewLine()
-								end							
-								local buttonserverfunction = GUI:Button(tostring(backtosleep.serveridtoname[e]),100,20)
-								if GUI:IsItemClicked(buttonserverfunction) then 
-									backtosleep.currentservertravel = backtosleep.serveridtoname[e]
-									ToggleRun(backtosleep.serveridtoname[e])
-								end
+							if counter >= 4 then
+								counter = 0
 								GUI:SameLine()
-								counter = counter  +  1 
+								GUI:NewLine()
 							end
+							local buttonserverfunction = GUI:Button(tostring(backtosleep.serveridtoname[e]),100,20)
+							if GUI:IsItemClicked(buttonserverfunction) then
+								backtosleep.currentservertravel = backtosleep.serveridtoname[e]
+								ToggleRun(backtosleep.serveridtoname[e])
+							end
+							GUI:SameLine()
+							counter = counter + 1
 						end
-					end					
+					end
+				end
 				GUI:SameLine()
 				GUI:NewLine()
-					if Player.GrandCompanyRank >= 9 then
-						if Player.GrandCompany == 2 then
-							guitogglebutton("twinaddersbarracks","Twin Adders")
-						elseif Player.GrandCompany == 1 then
-							guitogglebutton("maelstrombarracks","Maelstrom")
-						elseif Player.GrandCompany == 3 then
-							guitogglebutton("immortalbarracks","Immortal")
-						end
-						GUI:SameLine()
+				if Player.GrandCompanyRank >= 9 then
+					if Player.GrandCompany == 2 then
+						guitogglebutton("twinaddersbarracks","Twin Adders")
+					elseif Player.GrandCompany == 1 then
+						guitogglebutton("maelstrombarracks","Maelstrom")
+					elseif Player.GrandCompany == 3 then
+						guitogglebutton("immortalbarracks","Immortal")
 					end
-					if Player.GrandCompanyRank >= 9 then
-						if Player.GrandCompany == 2 then
-							local buttonfunction = GUI:Button("GC Ticket",100,20)
-							if GUI:IsItemClicked(buttonfunction) then
-								backtosleep.useTeleportGC()
-								ToggleRun("twinaddersbarracks")
-							end
-							--guitogglebutton("twinaddersbarracks","Twin Adders")
-						elseif Player.GrandCompany == 1 then
-							local buttonfunction = GUI:Button("GC Ticket",100,20)
-							if GUI:IsItemClicked(buttonfunction) then 
-								backtosleep.useTeleportGC()
-								ToggleRun("maelstrombarracks")
-							end						
-							--guitogglebutton("maelstrombarracks","Maelstrom")
-						elseif Player.GrandCompany == 3 then
-							local buttonfunction = GUI:Button("GC Ticket",100,20)
-							if GUI:IsItemClicked(buttonfunction) then 
-								backtosleep.useTeleportGC()
-								ToggleRun("immortalbarracks")
-							end						
-							--guitogglebutton("immortalbarracks","Immortal")
+					GUI:SameLine()
+				end
+				if Player.GrandCompanyRank >= 9 then
+					if Player.GrandCompany == 2 then
+						local buttonfunction = GUI:Button("GC Ticket",100,20)
+						if GUI:IsItemClicked(buttonfunction) then
+							backtosleep.useTeleportGC()
+							ToggleRun("twinaddersbarracks")
 						end
-						GUI:SameLine()
+						--guitogglebutton("twinaddersbarracks","Twin Adders")
+					elseif Player.GrandCompany == 1 then
+						local buttonfunction = GUI:Button("GC Ticket",100,20)
+						if GUI:IsItemClicked(buttonfunction) then
+							backtosleep.useTeleportGC()
+							ToggleRun("maelstrombarracks")
+						end
+						--guitogglebutton("maelstrombarracks","Maelstrom")
+					elseif Player.GrandCompany == 3 then
+						local buttonfunction = GUI:Button("GC Ticket",100,20)
+						if GUI:IsItemClicked(buttonfunction) then
+							backtosleep.useTeleportGC()
+							ToggleRun("immortalbarracks")
+						end
+						--guitogglebutton("immortalbarracks","Immortal")
 					end
-					--guitogglebutton("hoptobooster","Do WorldHop")
+					GUI:SameLine()
+				end
 				GUI:SameLine()
 				GUI:NewLine()
-					local stoprunning = GUI:Button("Stop",430,50)
-					if GUI:IsItemClicked(stoprunning) then 
+				local stoprunning = GUI:Button("Stop",430,50)
+					if GUI:IsItemClicked(stoprunning) then
 						stopRunning()
 					end
-				
-            end
-            GUI:End()
-        end
-    end
+			end
+			GUI:End()
+		end
+	end
 end
 
 function backtosleep.useTeleportGC()
@@ -750,17 +750,15 @@ function backtosleep.useTeleportGC()
 					end
 					if item.ID == 21070 and Player.GrandCompany == 2 then
 						item:Cast(Player)
-					end					
+					end
 					if item.ID == 21071 and Player.GrandCompany == 3 then
 						item:Cast(Player)
-					end		
+					end
 				end
 			end
 		end
-	end						
-end	
-
-
+	end
+end
 
 local function teleportTo(string)
 	if TimeSince(backtosleepteleportnow) > 6000 then
@@ -782,52 +780,51 @@ local function worldTravelAetheryteInteract(contentid,querynumber)
 				Player:SetTarget(tonumber(tostring(next(MEntityList("contentid="..tostring(contentid)..",nearest")))))
 				backtosleepinteractnow = Now()
 			end
-			d("gettarget == nil")
+			--d("gettarget == nil")
 		end
 		if not IsControlOpen("SelectString") and not (Player:GetTarget() == nil) and not IsControlOpen("WorldTravelSelect") and not IsControlOpen("SelectYesno") then
 			if TimeSince(backtosleepinteractnow) > 1000 then
 				Player:Interact(Player:GetTarget().id)
 				backtosleepinteractnow = Now()
 			end
-			d("not gettarget == nil")
+			--d("not gettarget == nil")
 		end
 		if IsControlOpen("SelectString") then
 			local worlddataindex = 2
 			for i,string in pairs(GetControl("SelectString"):GetData()) do if string == "Visit Another World Server." then worlddataindex = i end end
-				
 			if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[worlddataindex] == "Visit Another World Server." then
 				if TimeSince(backtosleepinteractnow) > 1000 then
 					UseControlAction("SelectString", "SelectIndex", worlddataindex)
 					backtosleepinteractnow = Now()
 				end
-				d("visit another world server")
+				--d("visit another world server")
 			end
 		end
 		if IsControlOpen("WorldTravelSelect") then
 			if TimeSince(backtosleepinteractnow) > 1000 then
-				d("the fuck?")
-				d("querynumber = "..tostring(querynumber))
+				--d("the fuck?")
+				--d("querynumber = "..tostring(querynumber))
 				UseControlAction("WorldTravelSelect", "SelectIndex", querynumber)
-				backtosleepinteractnow = Now() 
+				backtosleepinteractnow = Now()
 			end
 		end
 		if IsControlOpen("SelectYesno") then
 			if TimeSince(backtosleepinteractnow) > 1000 then
 				UseControlAction("SelectYesno", "Yes")
-				backtosleepinteractnow = Now() 
+				backtosleepinteractnow = Now()
 			end
 		end
 	end
 end
 
 local function findAthernet(tableathernet,name)
-	for _, v in pairs(tableathernet) do  
+	for _, v in pairs(tableathernet) do
 		if v.string == name then
 			return v.index
 		end
-	end 
+	end
 	return nil
-end		
+end
 
 local function bigAetheryteInteract(contentid,querystring)
 	if MEntityList("contentid="..tostring(contentid)..",maxdistance=25") then
@@ -843,8 +840,6 @@ local function bigAetheryteInteract(contentid,querystring)
 				backtosleepinteractnow = Now()
 			end
 		end
-		
-			
 		if IsControlOpen("SelectString") and GetControl("SelectString"):GetData()[0] == "Aethernet." and not IsControlOpen("TelepotTown") then
 			if TimeSince(backtosleepinteractnow) > 1000 then
 				UseControlAction("SelectString", "SelectIndex", 0)
@@ -863,18 +858,15 @@ local function bigAetheryteInteract(contentid,querystring)
 								stopIfMoving()
 								stopRunning()
 							end
-							
 							UseControlAction("TelepotTown", "Teleport", currentindex)
-							backtosleepinteractnow = Now() 
+							backtosleepinteractnow = Now()
 						end
 					end
 				end
 			end
 		end
-		
 	end
 end
-
 
 local function innGuyInteract(contentid)
 	if MEntityList("contentid="..tostring(contentid)..",maxdistance=25") then
@@ -892,7 +884,7 @@ local function innGuyInteract(contentid)
 				end
 			end
 		end
-	end	
+	end
 end
 
 local function barracksDoorInteract(contentid)
@@ -911,9 +903,8 @@ local function barracksDoorInteract(contentid)
 				end
 			end
 		end
-	end	
+	end
 end
-
 
 local function canMoveTo(posx,posy,posz)
 	if TimeSince(backtosleepmovenow) > 8000 then
@@ -943,33 +934,18 @@ local function randomMoveTo(location,min,max)
 	end
 end
 
-
--- local function cityBigAetheryteTravel(posx,posy,posz,deviation,aetheryteContentID,querystring)
-	-- if not (math.distance3d(Player.pos,{x= posx,y= posy, z= posz})<= deviation) then
-		-- canMoveTo(posx,posy,posz)
-	-- else
-		-- stopIfMoving()
-		-- bigAetheryteInteract(aetheryteContentID,querystring)
-	-- end
-
--- end
-
-
 local function cityBigAetheryteTravel(aetherytelocation,aetheryteid,aethernetquery)
---posx,posy,posz,deviation,aetheryteContentID,querystring
 	local posx = backtosleep.pos.loc[aetherytelocation].x
 	local posy = backtosleep.pos.loc[aetherytelocation].y
 	local posz = backtosleep.pos.loc[aetherytelocation].z
 	local deviation = backtosleep.pos.aetheryteID[aetheryteid].tpradius
 	local aetheryteContentID = backtosleep.pos.aetheryteID[aetheryteid].id
-
 	if not (math.distance3d(Player.pos,{x= posx,y= posy, z= posz})<= deviation) then
 		canMoveTo(posx,posy,posz)
 	else
 		stopIfMoving()
 		bigAetheryteInteract(aetheryteContentID,aethernetquery)
 	end
-
 end
 
 local function cityBigAetheryteWorldTravel(aetherytelocation,aetheryteid,worldindex)
@@ -982,6 +958,41 @@ local function cityBigAetheryteWorldTravel(aetherytelocation,aetheryteid,worldin
 	worldTravelAetheryteInteract(aetheryteContentID,worldindex)
 end
 
+local function BigAetheryteInteractByIndex(aetherytelocation,aetheryteid,queryindex)
+	local posx = backtosleep.pos.loc[aetherytelocation].x
+	local posy = backtosleep.pos.loc[aetherytelocation].y
+	local posz = backtosleep.pos.loc[aetherytelocation].z
+	local deviation = backtosleep.pos.aetheryteID[aetheryteid].tpradius
+	local aetheryteContentID = backtosleep.pos.aetheryteID[aetheryteid].id
+	if not (math.distance3d(Player.pos,{x= posx,y= posy, z= posz})<= deviation) then
+		canMoveTo(posx,posy,posz)
+	else
+		stopIfMoving()
+		backtosleeprandompoint = nil
+		local contentid = aetheryteContentID
+		if MEntityList("contentid="..tostring(contentid)..",maxdistance=25") then
+			if Player:GetTarget() == nil then
+				if TimeSince(backtosleepinteractnow) > 1000 then
+					Player:SetTarget(tonumber(tostring(next(MEntityList("contentid="..tostring(contentid)..",nearest")))))
+					backtosleepinteractnow = Now()
+				end
+			end
+			if not IsControlOpen("SelectString") and not (Player:GetTarget() == nil) then
+				if TimeSince(backtosleepinteractnow) > 1000 then
+					Player:Interact(Player:GetTarget().id)
+					backtosleepinteractnow = Now()
+				end
+			end
+			if IsControlOpen("SelectString") then
+				if TimeSince(backtosleepinteractnow) > 1000 then
+					UseControlAction("SelectString", "SelectIndex", queryindex)
+					backtosleepinteractnow = Now()
+				end
+			end
+		end
+	end
+end
+
 local function cityBigAetheryteTeleport(posx,posy,posz,deviation)
 	if not (math.distance3d(Player.pos,{x= posx,y= posy, z= posz})<= deviation) then
 		canMoveTo(posx,posy,posz)
@@ -989,9 +1000,7 @@ local function cityBigAetheryteTeleport(posx,posy,posz,deviation)
 		stopIfMoving()
 		stopRunning()
 	end
-
 end
-
 
 function innGuyTravel(string)
 	local posx = backtosleep.pos.innkeeper[string].x
@@ -1021,7 +1030,7 @@ function backtosleep.exportGridaniaInn()
 	if iAmOnMap("The Roost") then
 		stopRunning()
 	elseif not iAmOnMap("Old Gridania") then
-		teleportTo("Gridania")		
+		teleportTo("Gridania")
 	elseif iAmOnMap("Old Gridania") then
 		innGuyTravel("Gridania")
 	end
@@ -1036,7 +1045,7 @@ function backtosleep.exportLimsaInn()
 		cityBigAetheryteTravel("Limsa Aetheryte","Limsa","The Aftcastle.")
 	elseif iAmOnMap("Limsa Lominsa Upper Deck") then
 		innGuyTravel("Limsa")
-	end	
+	end
 end
 
 function backtosleep.exportUldahInn()
@@ -1048,11 +1057,11 @@ function backtosleep.exportUldahInn()
 		if  iAmOnLocRange("Ul'dah Aetheryte") then
 			cityBigAetheryteTravel("Ul'dah Aetheryte","Ul'dah","Adventurers' Guild.")
 		elseif iAmOnLocRange("Ul'dah Inn Area") then
-			innGuyTravel("Ul'dah")				
+			innGuyTravel("Ul'dah")
 		else
 			teleportTo("Ul'dah")
 		end
-	end	
+	end
 end
 
 function backtosleep.exportIshgardInn()
@@ -1064,11 +1073,11 @@ function backtosleep.exportIshgardInn()
 		if iAmOnLocRange("Ishgard Aetheryte") then
 			cityBigAetheryteTravel("Ishgard Aetheryte","Ishgard","The Forgotten Knight.")
 		elseif iAmOnLocRange("Ishgard Inn Area") then
-			innGuyTravel("Ishgard")												
+			innGuyTravel("Ishgard")
 		else
 			teleportTo("Ishgard")
 		end
-	end	
+	end
 end
 
 function backtosleep.exportKuganeInn()
@@ -1080,11 +1089,11 @@ function backtosleep.exportKuganeInn()
 		if iAmOnLocRange("Kugane Aetheryte") then
 			cityBigAetheryteTravel("Kugane Aetheryte","Kugane","Bokairo Inn.")
 		elseif iAmOnLocRange("Kugane Inn Area") then
-			innGuyTravel("Kugane")												
+			innGuyTravel("Kugane")
 		else
 			teleportTo("Kugane")
 		end
-	end	
+	end
 end
 
 function backtosleep.exportCrystariumInn()
@@ -1096,11 +1105,11 @@ function backtosleep.exportCrystariumInn()
 		if iAmOnLocRange("Crystarium Aetheryte") then
 			cityBigAetheryteTravel("Crystarium Aetheryte","Crystarium","The Pendants.")
 		elseif iAmOnLocRange("Crystarium Inn Area") then
-			innGuyTravel("Crystarium")												
+			innGuyTravel("Crystarium")
 		else
 			teleportTo("Crystarium")
 		end
-	end	
+	end
 end
 
 function backtosleep.exportGCBarracks()
@@ -1109,10 +1118,10 @@ function backtosleep.exportGCBarracks()
 			if iAmOnMap("TwinAdders Barracks")then
 				stopRunning()
 			elseif not iAmOnMap("Old Gridania") then
-				teleportTo("Gridania")		
+				teleportTo("Gridania")
 			elseif iAmOnMap("Old Gridania") then
 				barracksDoorTravel("TwinAdders")
-			end		
+			end
 		elseif Player.GrandCompany == 1 then --maelstrom
 			if iAmOnMap("Maelstrom Barracks") then
 				stopRunning()
@@ -1122,19 +1131,18 @@ function backtosleep.exportGCBarracks()
 				cityBigAetheryteTravel("Limsa Aetheryte","Limsa","The Aftcastle.")
 			elseif iAmOnMap("Limsa Lominsa Upper Deck") then
 				barracksDoorTravel("Maelstrom")
-			end	
+			end
 		elseif Player.GrandCompany == 3 then -- immortal
 			if iAmOnMap("Immortal Barracks")then
 				stopRunning()
 			elseif not iAmOnMap("Steps of Nald") then
-				teleportTo("Ul'dah")		
+				teleportTo("Ul'dah")
 			elseif iAmOnMap("Steps of Nald") then
 				barracksDoorTravel("Immortal")
-			end		
+			end
 		end
-	end	
+	end
 end
-
 
 function backtosleep.exportWorldTravel(worldstring)
 	if iAmOnLocRange("Limsa Aetheryte") then
@@ -1187,21 +1195,18 @@ function backtosleep.exportWorldTravelRefactored(worldstring,locstring,aetheryte
 	end
 end
 
-
-
-
-function backtosleep.OnUpdateHandler( Event, ticks )	
---ROOST
+function backtosleep.OnUpdateHandler( Event, ticks )
+	--ROOST
 	if backtosleep.runningroost then
 		if iAmOnMap("The Roost")then
 			stopRunning()
 		elseif not iAmOnMap("Old Gridania") then
-			teleportTo("Gridania")		
+			teleportTo("Gridania")
 		elseif iAmOnMap("Old Gridania") then
 			innGuyTravel("Gridania")
 		end
 	end
---MIZZENMAST	
+	--MIZZENMAST
 	if backtosleep.runningmizzen then
 		if iAmOnMap("Mizzenmast") then
 			stopRunning()
@@ -1211,9 +1216,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			cityBigAetheryteTravel("Limsa Aetheryte","Limsa","The Aftcastle")
 		elseif iAmOnMap("Limsa Lominsa Upper Deck") then
 			innGuyTravel("Limsa")
-		end		
+		end
 	end
---HOURGLASS	
+	--HOURGLASS
 	if backtosleep.runninghourglass then
 		if iAmOnMap("The Hourglass") then
 			stopRunning()
@@ -1223,13 +1228,13 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			if  iAmOnLocRange("Ul'dah Aetheryte") then
 				cityBigAetheryteTravel("Ul'dah Aetheryte","Ul'dah","Adventurers' Guild")
 			elseif iAmOnLocRange("Ul'dah Inn Area") then
-				innGuyTravel("Ul'dah")				
+				innGuyTravel("Ul'dah")
 			else
 				teleportTo("Ul'dah")
 			end
-		end		
+		end
 	end
---CloudNine
+	--CloudNine
 	if backtosleep.runningcloudnine then
 		if iAmOnMap("Cloudnine") then
 			stopRunning()
@@ -1239,13 +1244,13 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			if iAmOnLocRange("Ishgard Aetheryte") then
 				cityBigAetheryteTravel("Ishgard Aetheryte","Ishgard","The Forgotten Knight")
 			elseif iAmOnLocRange("Ishgard Inn Area") then
-				innGuyTravel("Ishgard")												
+				innGuyTravel("Ishgard")
 			else
 				teleportTo("Ishgard")
 			end
-		end		
+		end
 	end
---BokairoInn
+	--BokairoInn
 	if backtosleep.runningbokairoinn then
 		if iAmOnMap("Bokairo Inn") then
 			stopRunning()
@@ -1255,13 +1260,13 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			if iAmOnLocRange("Kugane Aetheryte") then
 				cityBigAetheryteTravel("Kugane Aetheryte","Kugane","Bokairo Inn")
 			elseif iAmOnLocRange("Kugane Inn Area") then
-				innGuyTravel("Kugane")												
+				innGuyTravel("Kugane")
 			else
 				teleportTo("Kugane")
 			end
-		end		
+		end
 	end
---ThePendants	
+	--ThePendants
 	if backtosleep.runningthependants then
 		if iAmOnMap("The Pendants") then
 			stopRunning()
@@ -1271,13 +1276,73 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			if iAmOnLocRange("Crystarium Aetheryte") then
 				cityBigAetheryteTravel("Crystarium Aetheryte","Crystarium","The Pendants")
 			elseif iAmOnLocRange("Crystarium Inn Area") then
-				innGuyTravel("Crystarium")												
+				innGuyTravel("Crystarium")
 			else
 				teleportTo("Crystarium")
 			end
-		end		
+		end
 	end
---FC Chest Limsa
+	--BaldesionAnnexe - Andron - Old Sharlayan
+	if backtosleep.runningoldsharlayaninn then
+		if iAmOnMap("Andron") then
+			stopRunning()
+		elseif not iAmOnMap("Old Sharlayan") then
+			teleportTo("Old Sharlayan")
+		elseif iAmOnMap("Old Sharlayan") then
+			if iAmOnLocRange("Old Sharlayan Aetheryte") == true then
+				cityBigAetheryteTravel("Old Sharlayan Aetheryte","Old Sharlayan","The Baldesion Annex")
+			elseif iAmOnLocRange("Old Sharlayan Aetheryte") == false and iAmOnLocRange("Old Sharlayan Inn Area") == false then
+				randomMoveTo("Old Sharlayan Aetheryte",0,10)
+			elseif iAmOnLocRange("Old Sharlayan Inn Area") then
+				innGuyTravel("Old Sharlayan")
+			else
+				teleportTo("Old Sharlayan")
+			end
+		end
+	end
+	--Old Sharlayan Leve
+	if backtosleep.runningoldsharlayanleve then
+		if iAmOnMap("Old Sharlayan") then
+			if iAmOnLocRange("Old Sharlayan Leve Area", 5) then
+				stopRunning()
+			elseif iAmOnLocRange("Old Sharlayan Leve Area", 60) == true then
+				randomMoveTo("Old Sharlayan Leve Area",0,4)
+			elseif iAmOnLocRange("Old Sharlayan Aetheryte", 8) == true then
+				cityBigAetheryteTravel("Old Sharlayan Aetheryte","Old Sharlayan","Scholar's Harbor")
+			elseif iAmOnLocRange("Old Sharlayan Aetheryte", 8) == false and iAmOnLocRange("Old Sharlayan Leve Area", 60) == false then
+				randomMoveTo("Old Sharlayan Aetheryte",0,5)
+			else
+				teleportTo("Old Sharlayan") --fallback should never happen
+			end
+		elseif not iAmOnMap("Old Sharlayan") then
+			teleportTo("Old Sharlayan")
+		end
+	end
+	--The Firmament Collector
+	if backtosleep.runningthefirmamentcollector then
+		if iAmOnMap("The Firmament") then
+			if iAmOnLocRange("The Firmament Collectable Stop", 5) then
+				stopRunning()
+			elseif iAmOnLocRange("The Firmament Collectable Stop", 200) == true then
+				randomMoveTo("The Firmament Collectable Stop",0,1)
+			else
+				teleportTo("Ishgard") --fallback should never happen
+			end
+		elseif iAmOnMap("Foundation") then
+			if iAmOnLocRange("Ishgard Aetheryte") == true then
+				BigAetheryteInteractByIndex("Ishgard Aetheryte","Ishgard",1)
+			elseif iAmOnLocRange("Ishgard Aetheryte", 8) == false then
+				randomMoveTo("Ishgard Aetheryte",0,7)
+			else
+				teleportTo("Ishgard") --fallback should never happen
+			end
+		elseif not iAmOnMap("Foundation") then
+			teleportTo("Ishgard")
+		else
+			btslog("The Firmament Collector failed - contact dev",true) -- error handler
+		end
+	end
+	--FC Chest Limsa
 	if backtosleep.runningfclimsa then
 		if iAmOnMap("Limsa Lominsa Lower Deck") and iAmOnLocRange("Limsa FC Chest Stop") then
 			if not Player:IsMoving() then
@@ -1291,22 +1356,21 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			if iAmOnLocRange("Limsa Aetheryte") then
 				cityBigAetheryteTravel("Limsa Aetheryte","Limsa","Hawkers' Alley")
 			elseif iAmOnLocRange("Limsa FC Chest Area") then
-				randomMoveTo("Limsa FC Chest Stop",0,6)				
+				randomMoveTo("Limsa FC Chest Stop",0,6)
 			else
 				teleportTo("Limsa")
 			end
-		end		
+		end
 	end
---Central Aetheryte Limsa
+	--Central Aetheryte Limsa
 	if backtosleep.runningcentrallimsa then
 		if iAmOnLocRange("Limsa Aetheryte") then
 			cityBigAetheryteTeleport(-84.03,20.77,0.02,6)
 		else
 			teleportTo("Limsa")
 		end
-				
 	end
---MB Limsa
+	--MB Limsa
 	if backtosleep.runningmblimsa then
 		--map and range where it ends
 		if iAmOnMap("Limsa Lominsa Lower Deck") and iAmOnLocRange("Limsa MB Stop") then
@@ -1323,16 +1387,16 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Limsa Aetheryte") then
 				cityBigAetheryteTravel("Limsa Aetheryte","Limsa","Hawkers' Alley")
-			--if somewhere midway between aetheryte Hawkers' Alley and objective 		
+			--if somewhere midway between aetheryte Hawkers' Alley and objective
 			elseif iAmOnLocRange("Limsa MB Area") then
 				--random move to max radius < range where it ends (same pos as where it ends)
-				randomMoveTo("Limsa MB Stop",0,3)				
+				randomMoveTo("Limsa MB Stop",0,3)
 			else
 				teleportTo("Limsa")
 			end
-		end		
+		end
 	end
---Leve Kugane
+	--Leve Kugane
 	if backtosleep.runninglevekugane then
 		--map and range where it ends
 		if iAmOnMap("Kugane") and iAmOnLocRange("Kugane Leves Stop") then
@@ -1346,16 +1410,16 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			teleportTo("Kugane")
 		--if on map but not objective...
 		elseif iAmOnMap("Kugane") then
-			--if somewhere midway between aetheryte and objective 		
+			--if somewhere midway between aetheryte and objective
 			if iAmOnLocRange("Kugane Leves Area") then
 				--random move to max radius < range where it ends (same pos as where it ends)
-				randomMoveTo("Kugane Leves Stop",0,3)				
+				randomMoveTo("Kugane Leves Stop",0,3)
 			else
 				teleportTo("Kugane")
 			end
-		end		
+		end
 	end
---MB Kugane
+	--MB Kugane
 	if backtosleep.runningmbkugane then
 		--map and range where it ends
 		if iAmOnMap("Kugane") and iAmOnLocRange("Kugane MB Stop") then
@@ -1372,11 +1436,11 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Kugane Aetheryte") then
 				cityBigAetheryteTravel("Kugane Aetheryte","Kugane","Kogane Dori Markets")
-			--if somewhere midway between aetheryte and objective 		
+			--if somewhere midway between aetheryte and objective
 			elseif iAmOnLocRange("Kugane MB Area") then
 				--random move to max radius < range where it ends (same pos as where it ends)
 				if TimeSince(backtosleepmovenow) > 10000 then
-					randomMoveTo("Kugane MB Stop",0,3)				
+					randomMoveTo("Kugane MB Stop",0,3)
 				end
 			else
 				if iAmOnLocRange("Kugane Leves Area") then
@@ -1386,9 +1450,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 					teleportTo("Kugane")
 				end
 			end
-		end		
+		end
 	end
---Leve Crystarium
+	--Leve Crystarium
 	if backtosleep.runninglevecrystarium then
 		--map and range where it ends
 		if iAmOnMap("Crystarium") and iAmOnLocRange("Crystarium Leves Stop") then
@@ -1405,16 +1469,16 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Crystarium Aetheryte") then
 				cityBigAetheryteTravel("Crystarium Aetheryte","Crystarium","The Crystalline Mean")
-			--if somewhere midway between aetheryte and objective 		
+			--if somewhere midway between aetheryte and objective
 			elseif iAmOnLocRange("Crystarium Leves Area") then
 				--random move to max radius < range where it ends (same pos as where it ends)
-				randomMoveTo("Crystarium Leves Stop",0,3)				
+				randomMoveTo("Crystarium Leves Stop",0,3)
 			else
 				teleportTo("Crystarium")
 			end
-		end		
+		end
 	end
---MB Gridania
+	--MB Gridania
 	if backtosleep.runningmbgridania then
 		--map and range where it ends
 		if iAmOnMap("New Gridania") and iAmOnLocRange("Gridania MB Stop") then
@@ -1430,7 +1494,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif iAmOnMap("Old Gridania") then
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Gridania Aetheryte") then
-				cityBigAetheryteTravel("Gridania Aetheryte","Gridania","Leatherworkers' Guild") 						
+				cityBigAetheryteTravel("Gridania Aetheryte","Gridania","Leatherworkers' Guild")
 			else
 				teleportTo("Gridania")
 			end
@@ -1438,9 +1502,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			randomMoveTo("Gridania MB Stop",0,2)
 		else
 			teleportTo("Gridania")
-		end		
+		end
 	end
---MB Ul'dah	
+	--MB Ul'dah
 	if backtosleep.runningmbuldah then
 		--map and range where it ends
 		if iAmOnMap("Steps of Thal") and iAmOnLocRange("Ul'dah MB Stop") then
@@ -1456,7 +1520,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif iAmOnMap("Steps of Nald") then
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Ul'dah Aetheryte") then
-				cityBigAetheryteTravel("Ul'dah Aetheryte","Ul'dah","Sapphire Avenue Exchange") 						
+				cityBigAetheryteTravel("Ul'dah Aetheryte","Ul'dah","Sapphire Avenue Exchange")
 			else
 				teleportTo("Ul'dah")
 			end
@@ -1464,9 +1528,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			randomMoveTo("Ul'dah MB Stop",0,2)
 		else
 			teleportTo("Ul'dah")
-		end		
+		end
 	end
---FC Ul'dah	
+	--FC Ul'dah
 	if backtosleep.runningfculdah then
 		--map and range where it ends
 		if iAmOnMap("Steps of Thal") and iAmOnLocRange("Ul'dah FC Chest Stop") then
@@ -1482,7 +1546,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif iAmOnMap("Steps of Nald") then
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Ul'dah Aetheryte") then
-				cityBigAetheryteTravel("Ul'dah Aetheryte","Ul'dah","Sapphire Avenue Exchange") 						
+				cityBigAetheryteTravel("Ul'dah Aetheryte","Ul'dah","Sapphire Avenue Exchange")
 			else
 				teleportTo("Ul'dah")
 			end
@@ -1490,9 +1554,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			randomMoveTo("Ul'dah FC Chest Stop",0,2)
 		else
 			teleportTo("Ul'dah")
-		end		
+		end
 	end
---FC Gridania
+	--FC Gridania
 	if backtosleep.runningfcgridania then
 		--map and range where it ends
 		if iAmOnMap("New Gridania") and iAmOnLocRange("Gridania FC Chest Stop") then
@@ -1508,7 +1572,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 		elseif iAmOnMap("Old Gridania") then
 			--if around aetheryte interact and aetheryte to hawkers' Alley
 			if iAmOnLocRange("Gridania Aetheryte") then
-				cityBigAetheryteTravel("Gridania Aetheryte","Gridania","Leatherworkers' Guild") 						
+				cityBigAetheryteTravel("Gridania Aetheryte","Gridania","Leatherworkers' Guild")
 			else
 				teleportTo("Gridania")
 			end
@@ -1516,9 +1580,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			randomMoveTo("Gridania FC Chest Stop",0,2)
 		else
 			teleportTo("Gridania")
-		end		
+		end
 	end
---MB Ishgard
+	--MB Ishgard
 	if backtosleep.runningmbishgard then
 		if iAmOnMap("The Pillars") and iAmOnLocRange("Ishgard MB Stop") then
 			if not Player:IsMoving() then
@@ -1530,7 +1594,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			teleportTo("Ishgard")
 		elseif iAmOnMap("Foundation") then
 			if iAmOnLocRange("Ishgard Aetheryte") then
-				cityBigAetheryteTravel("Ishgard Aetheryte","Ishgard","The Jeweled Crozier") 						
+				cityBigAetheryteTravel("Ishgard Aetheryte","Ishgard","The Jeweled Crozier")
 			else
 				teleportTo("Ishgard")
 			end
@@ -1538,9 +1602,9 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			randomMoveTo("Ishgard MB Stop",0,2)
 		else
 			teleportTo("Ishgard")
-		end		
+		end
 	end
---Eulmore Vendor
+	--Eulmore Vendor
 	if currentProcess("vendoreulmore") then
 		if iAmOnMap("Eulmore") and iAmOnLocRange("Eulmore Vendor Stop") then
 			if not Player:IsMoving() then
@@ -1554,7 +1618,7 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			teleportTo("Eulmore")
 		end
 	end
---Exarchic Eulmore
+	--Exarchic Eulmore
 	if currentProcess("exarchiceulmore") then
 		if iAmOnMap("Eulmore") and iAmOnLocRange("Eulmore Exarchic Stop") then
 			if not Player:IsMoving() then
@@ -1568,17 +1632,17 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			teleportTo("Eulmore")
 		end
 	end
---TwinAdders
+	--TwinAdders
 	if currentProcess("twinaddersbarracks") then
 		if iAmOnMap("TwinAdders Barracks")then
 			stopRunning()
 		elseif not iAmOnMap("Old Gridania") then
-			teleportTo("Gridania")		
+			teleportTo("Gridania")
 		elseif iAmOnMap("Old Gridania") then
 			barracksDoorTravel("TwinAdders")
 		end
 	end
---Maelstrom	
+	--Maelstrom
 	if currentProcess("maelstrombarracks") then
 		if iAmOnMap("Maelstrom Barracks") then
 			stopRunning()
@@ -1588,19 +1652,19 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			cityBigAetheryteTravel("Limsa Aetheryte","Limsa","The Aftcastle")
 		elseif iAmOnMap("Limsa Lominsa Upper Deck") then
 			barracksDoorTravel("Maelstrom")
-		end		
+		end
 	end
---Immortal
+	--Immortal
 	if currentProcess("immortalbarracks") then
 		if iAmOnMap("Immortal Barracks")then
 			stopRunning()
 		elseif not iAmOnMap("Steps of Nald") then
-			teleportTo("Ul'dah")		
+			teleportTo("Ul'dah")
 		elseif iAmOnMap("Steps of Nald") then
 			barracksDoorTravel("Immortal")
 		end
 	end
---WORLDHOP
+	--WORLDHOP
 	if not (backtosleep.currentservertravel == "") and currentProcess(backtosleep.currentservertravel) then
 		if Player.currentworld == backtosleep.servernametoid[backtosleep.currentservertravel] then
 			stopRunning()
@@ -1609,8 +1673,28 @@ function backtosleep.OnUpdateHandler( Event, ticks )
 			backtosleep.exportWorldTravelRefactored(backtosleep.currentservertravel,"Gridania Aetheryte","Gridania")
 		end
 	end
+	--Radz-at-Han
+	if backtosleep.runningradzathan then
+		if iAmOnMap("Radz-at-Han") and iAmOnLocRange("Radz-at-Han Stop") then
+			stopRunning()
+		elseif iAmOnMap("Radz-at-Han") and not iAmOnLocRange("Radz-at-Han Stop") then
+			randomMoveTo("Radz-at-Han Stop",0,2)
+		elseif not iAmOnMap("Radz-at-Han") then
+			teleportTo("Radz-at-Han")
+		end
+	end
+	--Radz-at-Han Collectable
+	if backtosleep.runningcollectableradzathan then
+		if iAmOnMap("Radz-at-Han") and iAmOnLocRange("Radz-at-Han Collectable Stop") then
+			stopRunning()
+		elseif iAmOnMap("Radz-at-Han") and not iAmOnLocRange("Radz-at-Han Collectable Stop") then
+			randomMoveTo("Radz-at-Han Collectable Stop",0,1)
+		elseif not iAmOnMap("Radz-at-Han") then
+			teleportTo("Radz-at-Han")
+		end
+	end
 end
 
 RegisterEventHandler("Gameloop.Update",backtosleep.OnUpdateHandler,"backtosleep onupdate")
-RegisterEventHandler("Module.Initalize",backtosleep.ModuleInit,"backtosleep init") 
+RegisterEventHandler("Module.Initalize",backtosleep.ModuleInit,"backtosleep init")
 RegisterEventHandler("Gameloop.Draw", backtosleep.Draw, "backtosleep Draw")
